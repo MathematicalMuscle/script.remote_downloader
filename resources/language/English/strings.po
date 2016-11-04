@@ -1,0 +1,61 @@
+# Kodi Media Center language file
+# Addon Name: Remote Downloader
+# Addon id: script.remote_downloader
+# Addon Provider: Mathematical Muscle
+msgid ""
+msgstr ""
+"Project-Id-Version: Kodi Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: English (http://www.transifex.com/projects/p/xbmc-addons/language/en/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#32000"
+msgid "General"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Local Kodi"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Download to this device?"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Local movies download folder:"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Local tv download folder:"
+msgstr ""
+
+msgctxt "#32005"
+msgid "Local temp download folder:"
+msgstr ""
+
+msgctxt "#32006"
+msgid "Remote Kodi"
+msgstr ""
+
+msgctxt "#32007"
+msgid "Remote IP address:"
+msgstr ""
+
+msgctxt "#32008"
+msgid "Remote username:"
+msgstr ""
+
+msgctxt "#32009"
+msgid "Remote password:"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Remote port:"
+msgstr ""

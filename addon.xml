@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.remote_downloader" name="Remote Downloader" version="0.0.1" provider-name="Mathematical Muscle">
+    <requires>
+        <import addon="xbmc.python" version="2.14.0"/>
+        <import addon="script.common.plugin.cache" version="0.9.1" />
+        <import addon="script.module.requests" version="2.9.1" />
+    </requires>
+    <extension point="xbmc.python.script" library="addon.py">
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <platform>all</platform>
+        <summary lang="en">Download a stream onto a remote device</summary>
+        <description lang="en">Download a stream onto a remote device</description>
+        <license>GNU General Public License, v2</license>
+        <language>en</language>
+    </extension>
+</addon>
