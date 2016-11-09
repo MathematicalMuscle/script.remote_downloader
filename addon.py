@@ -200,6 +200,7 @@ def getJsonRemote(host, port, username, password, method, parameters):
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
+        # modify Exodus
         infile = xbmc.translatePath('special://home/addons/plugin.video.exodus/exodus.py')
         if xbmcvfs.exists(infile):
             with open(infile, 'r') as f:
@@ -215,6 +216,32 @@ if __name__ == "__main__":
                 xbmcgui.Dialog().ok('Remote Downloader', 'Exodus successfully modified!')
             else:
                 xbmcgui.Dialog().ok('Remote Downloader', 'Exodus was already modified.')
+
+        # modify Last Played
+        infile = xbmc.translatePath('special://home/addons/plugin.video.last_played/addon.py')
+        if xbmcvfs.exists(infile):
+            with open(infile, 'r') as f:
+                text = f.read()
+            old = 'li.addContextMenuItems(command)'
+            new = "if line['show'] and line['season'] and line['episode']:\n"
+            new += "\t\t\t\t\ttitle = '{0} S{1:02d}E{2:02d}'.format(line['show'], int(line['season']), int(line['episode']))\n"
+            new += "\t\t\t\telse:\n"
+            new += "\t\t\t\t\ttitle = line['title']\n"
+            new += "\t\t\t\tinfo = {'url': line['video'], 'image': line['thumbnail'], 'title': title}\n"
+            new += "\t\t\t\tcommand.append(('Download', 'RunScript(script.remote_downloader, {0})'.format(urllib.quote_plus(str(info)))))\n"
+            new += "\t\t\t\tli.addContextMenuItems(command)"
+            #new = "command.append(('Download', ))"
+            #new = "if line['source'] == 'plugin.video.exodus':\n\t\t\t\t\tcommand.append(('Download with Exodus', 'RunScript(script.exodus_downloader, {0})'.format(urllib.quote_plus(str(line)))))\n\t\t\t\tli.addContextMenuItems(command)"
+            if new not in text:
+                # text = text.replace(new, old)
+                text = text.replace(old, new)
+                with open(infile, 'w') as f:
+                    f.write(text)
+                xbmcgui.Dialog().ok('Remote Downloader', 'Last Played successfully modified!')
+            else:
+                xbmcgui.Dialog().ok('Remote Downloader', 'Last Played was already modified.')
+
+        # nothing to download, so exit
         sys.exit()
 
     params = eval(urllib.unquote_plus(sys.argv[1]).replace('streaminfo=', ''))
@@ -229,22 +256,6 @@ if __name__ == "__main__":
     title = params.get('title')
     url = params.get('url')
     preapproved = params.get('preapproved')
-
-    """
-    if title is not None:
-        xbmcgui.Dialog().ok('title', str(title))
-        sys.exit()
-    if image is not None:
-        xbmcgui.Dialog().ok('image', str(image))
-        sys.exit()
-    if url is not None:
-        xbmcgui.Dialog().ok('url', str(url))
-        sys.exit()
-
-    xbmc.log(str(url))
-    xbmc.log(str(title))
-    xbmc.log(str(image))
-    """
 
     # if there is no url, exit
     if url is None:
