@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.remote_downloader" name="Remote Downloader" version="0.0.1" provider-name="Mathematical Muscle">
+<addon id="script.remote_downloader" name="Remote Downloader" version="0.0.2" provider-name="Mathematical Muscle">
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>
         <import addon="script.common.plugin.cache" version="0.9.1" />
@@ -14,4 +14,8 @@
         <license>GNU General Public License, v2</license>
         <language>en</language>
     </extension>
+    <news>
+        v0.0.1 (2016-11-04) - Initial commit
+        v0.0.2 (2016-11-08) - Added icon
+    </news>
 </addon>
