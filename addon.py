@@ -97,8 +97,11 @@ def get_dest(title, url0):
             except:
                 pass
         xbmcvfs.mkdir(dest)
-        dest = os.path.join(dest, transname)
-        xbmcvfs.mkdir(dest)
+
+        # put the movie into its own folder?
+        if xbmcaddon.Addon('script.remote_downloader').getSetting('local_movies_own_folder') == 'true':
+            dest = os.path.join(dest, transname)
+            xbmcvfs.mkdir(dest)
     else:
         # TV
         dest = xbmcaddon.Addon('script.remote_downloader').getSetting('local_tv_folder')

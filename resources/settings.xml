@@ -5,6 +5,7 @@
     <setting label="32001" type="lsep"/>
     <setting label="32002" id="download_local" type="bool" default="true"/>
     <setting label="32003" id="local_movies_folder" type="folder" source="videos"/>
+    <setting label="32011" id="local_movies_own_folder" type="bool" default="false"/>
     <setting label="32004" id="local_tv_folder" type="folder" source="videos"/>
     <setting label="32005" id="local_temp_folder" type="folder" source="auto" value=""/>
     <!-- Remote Kodi -->

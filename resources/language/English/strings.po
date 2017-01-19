@@ -59,3 +59,7 @@ msgstr ""
 msgctxt "#32010"
 msgid "Remote port:"
 msgstr ""
+
+msgctxt "#32011"
+msgid "Download each movie into its own folder?"
+msgstr ""
