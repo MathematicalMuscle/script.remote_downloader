@@ -208,17 +208,19 @@ if __name__ == "__main__":
         if xbmcvfs.exists(infile):
             with open(infile, 'r') as f:
                 text = f.read()
-            old = 'try: downloader.download(name, image, sources().sourcesResolve(json.loads(source)[0], True))'
+            old = 'try: downloader.download(name, image, sources.sources().sourcesResolve(json.loads(source)[0], True))'
             new = 'try:\n'
             new += '        import urllib\n'
-            new += '        xbmc.executebuiltin("RunScript(script.remote_downloader, {0})".format(urllib.quote_plus(str({\'title\': name, \'image\': image, \'url\': sources().sourcesResolve(json.loads(source)[0], True)}))))'
+            new += '        xbmc.executebuiltin("RunScript(script.remote_downloader, {0})".format(urllib.quote_plus(str({\'title\': name, \'image\': image, \'url\': sources.sources().sourcesResolve(json.loads(source)[0], True)}))))'
             if old in text:
                 text = text.replace(old, new)
                 with open(infile, 'w') as f:
                     f.write(text)
                 xbmcgui.Dialog().ok('Remote Downloader', 'Exodus successfully modified!')
-            else:
+            elif new in text:
                 xbmcgui.Dialog().ok('Remote Downloader', 'Exodus was already modified.')
+            else:
+                xbmcgui.Dialog().ok('Remote Downloader', 'Exodus could not be modified.')
 
         # modify Last Played
         infile = xbmc.translatePath('special://home/addons/plugin.video.last_played/addon.py')
@@ -235,14 +237,16 @@ if __name__ == "__main__":
             new += "\t\t\t\tli.addContextMenuItems(command)"
             #new = "command.append(('Download', ))"
             #new = "if line['source'] == 'plugin.video.exodus':\n\t\t\t\t\tcommand.append(('Download with Exodus', 'RunScript(script.exodus_downloader, {0})'.format(urllib.quote_plus(str(line)))))\n\t\t\t\tli.addContextMenuItems(command)"
-            if new not in text:
+            if old in text and new not in text:
                 # text = text.replace(new, old)
                 text = text.replace(old, new)
                 with open(infile, 'w') as f:
                     f.write(text)
                 xbmcgui.Dialog().ok('Remote Downloader', 'Last Played successfully modified!')
-            else:
+            elif old in text and new in text:
                 xbmcgui.Dialog().ok('Remote Downloader', 'Last Played was already modified.')
+            else:
+                xbmcgui.Dialog().ok('Remote Downloader', 'Last Played could not be modified.')
 
         # nothing to download, so exit
         sys.exit()
