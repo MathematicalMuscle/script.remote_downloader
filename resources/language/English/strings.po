@@ -63,3 +63,7 @@ msgstr ""
 msgctxt "#32011"
 msgid "Download each movie into its own folder?"
 msgstr ""
+
+msgctxt "#32012"
+msgid "Update library after each download finishes?"
+msgstr ""

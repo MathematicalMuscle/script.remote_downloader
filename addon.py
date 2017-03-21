@@ -384,6 +384,11 @@ if __name__ == "__main__":
                             xbmcvfs.rename(temp_dest, dest)
 
                         done(title, dest, True)
+
+                        # update the library?
+                        if xbmcaddon.Addon('script.remote_downloader').getSetting('local_movies_folder') == 'true':
+                            update_library = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"VideoLibrary.Scan"}'))
+
                         sys.exit()
 
             except Exception, e:

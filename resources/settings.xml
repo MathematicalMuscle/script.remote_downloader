@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
   <category label="32000">
+    <setting label="32012" id="update_library" type="bool" default="true"/>
     <!-- Local Kodi -->
     <setting label="32001" type="lsep"/>
     <setting label="32002" id="download_local" type="bool" default="true"/>
