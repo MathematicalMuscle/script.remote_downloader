@@ -386,7 +386,7 @@ if __name__ == "__main__":
                         done(title, dest, True)
 
                         # update the library?
-                        if xbmcaddon.Addon('script.remote_downloader').getSetting('local_movies_folder') == 'true':
+                        if xbmcaddon.Addon('script.remote_downloader').getSetting('update_library') == 'true':
                             update_library = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"VideoLibrary.Scan"}'))
 
                         sys.exit()
