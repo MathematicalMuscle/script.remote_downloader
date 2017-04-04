@@ -1,4 +1,4 @@
-'''
+"""
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -24,7 +24,7 @@
     I also used the "Simple Python Script To Control XBMC via Web/JSON API"
     from SleepyP (http://forum.kodi.tv/showthread.php?tid=197645)
 
-'''
+"""
 
 import os
 import sys
@@ -73,7 +73,7 @@ def resp_content_resumable(url, headers, size, title, url0):
         resumable = False
 
     if resumable:
-        print "Download is resumable"
+        xbmc.log("Download is resumable")
 
     return resp, content, resumable
 
@@ -158,6 +158,60 @@ def done(title, dest, downloaded):
         xbmcgui.Window(10000).clearProperty('GEN-DOWNLOADED')
 
 
+def modify_addons():
+    # modify Exodus
+    infile = xbmc.translatePath('special://home/addons/plugin.video.exodus/exodus.py')
+    if xbmcvfs.exists(infile):
+        with open(infile, 'r') as f:
+            text = f.read()
+        old = 'try: downloader.download(name, image, sources.sources().sourcesResolve(json.loads(source)[0], True))'
+        new = 'try:\n'
+        new += '        import urllib\n'
+        new += '        xbmc.executebuiltin("RunScript(script.remote_downloader, {0})".format(urllib.quote_plus(str({\'title\': name, \'image\': image, \'url\': sources.sources().sourcesResolve(json.loads(source)[0], True)}))))'
+        if old in text:
+            text = text.replace(old, new)
+            with open(infile, 'w') as f:
+                f.write(text)
+            xbmcgui.Dialog().ok('Remote Downloader', 'Exodus successfully modified!')
+        elif new in text:
+            xbmcgui.Dialog().ok('Remote Downloader', 'Exodus was already modified.')
+        else:
+            xbmcgui.Dialog().ok('Remote Downloader', 'Exodus could not be modified.')
+
+    # set Exodus settings
+    xbmcaddon.Addon('plugin.video.exodus').setSetting('downloads', 'true')
+    if xbmcaddon.Addon('plugin.video.exodus').getSetting('movie.download.path') == "":
+        xbmcaddon.Addon('plugin.video.exodus').setSetting('movie.download.path', xbmc.translatePath('special://userdata'))
+    if xbmcaddon.Addon('plugin.video.exodus').getSetting('tv.download.path') == "":
+        xbmcaddon.Addon('plugin.video.exodus').setSetting('tv.download.path', xbmc.translatePath('special://userdata'))
+
+    # modify Last Played
+    infile = xbmc.translatePath('special://home/addons/plugin.video.last_played/addon.py')
+    if xbmcvfs.exists(infile):
+        with open(infile, 'r') as f:
+            text = f.read()
+        old = 'li.addContextMenuItems(command)'
+        new = "if line['show'] and line['season'] and line['episode']:\n"
+        new += "\t\t\t\t\ttitle = '{0} S{1:02d}E{2:02d}'.format(line['show'], int(line['season']), int(line['episode']))\n"
+        new += "\t\t\t\telse:\n"
+        new += "\t\t\t\t\ttitle = line['title']\n"
+        new += "\t\t\t\tinfo = {'url': line['video'], 'image': line['thumbnail'], 'title': title}\n"
+        new += "\t\t\t\tcommand.append(('Download', 'RunScript(script.remote_downloader, {0})'.format(urllib.quote_plus(str(info)))))\n"
+        new += "\t\t\t\tli.addContextMenuItems(command)"
+        # new = "command.append(('Download', ))"
+        # new = "if line['source'] == 'plugin.video.exodus':\n\t\t\t\t\tcommand.append(('Download with Exodus', 'RunScript(script.exodus_downloader, {0})'.format(urllib.quote_plus(str(line)))))\n\t\t\t\tli.addContextMenuItems(command)"
+        if old in text and new not in text:
+            # text = text.replace(new, old)
+            text = text.replace(old, new)
+            with open(infile, 'w') as f:
+                f.write(text)
+            xbmcgui.Dialog().ok('Remote Downloader', 'Last Played successfully modified!')
+        elif old in text and new in text:
+            xbmcgui.Dialog().ok('Remote Downloader', 'Last Played was already modified.')
+        else:
+            xbmcgui.Dialog().ok('Remote Downloader', 'Last Played could not be modified.')
+
+
 def getJsonRemote(host, port, username, password, method, parameters):
     # http://forum.kodi.tv/showthread.php?tid=197645
     # build the URL we're going to talk to
@@ -203,63 +257,16 @@ def getJsonRemote(host, port, username, password, method, parameters):
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        # modify Exodus
-        infile = xbmc.translatePath('special://home/addons/plugin.video.exodus/exodus.py')
-        if xbmcvfs.exists(infile):
-            with open(infile, 'r') as f:
-                text = f.read()
-            old = 'try: downloader.download(name, image, sources.sources().sourcesResolve(json.loads(source)[0], True))'
-            new = 'try:\n'
-            new += '        import urllib\n'
-            new += '        xbmc.executebuiltin("RunScript(script.remote_downloader, {0})".format(urllib.quote_plus(str({\'title\': name, \'image\': image, \'url\': sources.sources().sourcesResolve(json.loads(source)[0], True)}))))'
-            if old in text:
-                text = text.replace(old, new)
-                with open(infile, 'w') as f:
-                    f.write(text)
-                xbmcgui.Dialog().ok('Remote Downloader', 'Exodus successfully modified!')
-            elif new in text:
-                xbmcgui.Dialog().ok('Remote Downloader', 'Exodus was already modified.')
-            else:
-                xbmcgui.Dialog().ok('Remote Downloader', 'Exodus could not be modified.')
-
-        # modify Last Played
-        infile = xbmc.translatePath('special://home/addons/plugin.video.last_played/addon.py')
-        if xbmcvfs.exists(infile):
-            with open(infile, 'r') as f:
-                text = f.read()
-            old = 'li.addContextMenuItems(command)'
-            new = "if line['show'] and line['season'] and line['episode']:\n"
-            new += "\t\t\t\t\ttitle = '{0} S{1:02d}E{2:02d}'.format(line['show'], int(line['season']), int(line['episode']))\n"
-            new += "\t\t\t\telse:\n"
-            new += "\t\t\t\t\ttitle = line['title']\n"
-            new += "\t\t\t\tinfo = {'url': line['video'], 'image': line['thumbnail'], 'title': title}\n"
-            new += "\t\t\t\tcommand.append(('Download', 'RunScript(script.remote_downloader, {0})'.format(urllib.quote_plus(str(info)))))\n"
-            new += "\t\t\t\tli.addContextMenuItems(command)"
-            #new = "command.append(('Download', ))"
-            #new = "if line['source'] == 'plugin.video.exodus':\n\t\t\t\t\tcommand.append(('Download with Exodus', 'RunScript(script.exodus_downloader, {0})'.format(urllib.quote_plus(str(line)))))\n\t\t\t\tli.addContextMenuItems(command)"
-            if old in text and new not in text:
-                # text = text.replace(new, old)
-                text = text.replace(old, new)
-                with open(infile, 'w') as f:
-                    f.write(text)
-                xbmcgui.Dialog().ok('Remote Downloader', 'Last Played successfully modified!')
-            elif old in text and new in text:
-                xbmcgui.Dialog().ok('Remote Downloader', 'Last Played was already modified.')
-            else:
-                xbmcgui.Dialog().ok('Remote Downloader', 'Last Played could not be modified.')
+        modify_addons()
 
         # nothing to download, so exit
         sys.exit()
 
     params = eval(urllib.unquote_plus(sys.argv[1]).replace('streaminfo=', ''))
-    xbmc.log(str(params))
+    xbmc.log('script.remote_downloader: ' + str(params))
 
-    # regular parameters
+    # provided parameters
     image = params.get('image')
-    local_ip = params.get('local_ip')
-    local_username = params.get('local_username')
-    local_password = params.get('local_password')
-    local_port = params.get('local_port')
     title = params.get('title')
     url = params.get('url')
     preapproved = params.get('preapproved')
@@ -288,7 +295,7 @@ if __name__ == "__main__":
     if content < size:
         size = content
 
-    # get the tranlated name
+    # get the translated name
     ext = os.path.splitext(urlparse.urlparse(url0).path)[1][1:]
     if ext not in ['mp4', 'mkv', 'flv', 'avi', 'mpg']:
         ext = 'mp4'
@@ -319,10 +326,16 @@ if __name__ == "__main__":
 
         # make the remote Kodi download the stream
         results = getJsonRemote(ip, port, username, password, method, parameters)
-        xbmc.log(str(results))
+        xbmc.log('script.remote_downloader: ' + str(results))
 
     # download it locally
     else:
+        # provided parameters
+        local_ip = params.get('local_ip')
+        local_username = params.get('local_username')
+        local_password = params.get('local_password')
+        local_port = params.get('local_port')
+
         # get the destination path
         dest, temp_dest = get_dest(title, url0)
         if dest is None:
@@ -336,11 +349,11 @@ if __name__ == "__main__":
         resume = 0
         sleep = 0
 
-        print 'Download File Size : {0}MB {1}'.format(mb, dest)
+        xbmc.log('script.remote_downloader: ' + 'Download File Size : {0}MB {1}'.format(mb, dest))
 
         f = xbmcvfs.File(temp_dest, 'w')
 
-        chunk  = None
+        chunk = None
         chunks = []
 
         while True:
@@ -350,15 +363,14 @@ if __name__ == "__main__":
             percent = min(100 * downloaded / content, 100)
             if percent >= notify:
                 # show a notification of the download progress
-                xbmc.executebuiltin( "XBMC.Notification(%s,%s,%i,%s)" % ( title + ' - Download Progress - ' + str(percent)+'%', dest, 10000, image))
+                xbmc.executebuiltin("XBMC.Notification(%s,%s,%i,%s)".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000, image))
 
                 # send a notification to the Kodi that sent the download command
                 if local_ip is not None:
-                    parameters = {'title': title + ' - Download Progress - ' + str(percent)+'%', 'message': dest, 'image': image, 'displaytime': 10000}
+                    parameters = {'title': title + ' - Download Progress - ' + str(percent) + '%',
+                                  'message': dest, 'image': image, 'displaytime': 10000}
                     results = getJsonRemote(local_ip, int(local_port), local_username, local_password, "GUI.ShowNotification", parameters)
-                    xbmc.log(str(results))
-
-                print 'Download percent : %s %s %dMB downloaded : %sMB File Size : %sMB' % (str(percent)+'%', dest, mb, downloaded / 1000000, content / 1000000)
+                    xbmc.log('script.remote_downloader: ' + str(results))
 
                 notify += 10
 
@@ -366,7 +378,7 @@ if __name__ == "__main__":
             error = False
 
             try:
-                chunk  = resp.read(size)
+                chunk = resp.read(size)
                 if not chunk:
                     if percent < 99:
                         error = True
@@ -377,7 +389,7 @@ if __name__ == "__main__":
                             del c
 
                         f.close()
-                        print '%s download complete' % (dest)
+                        xbmc.log('script.remote_downloader: ' + '%s download complete'.format(dest))
 
                         # if it was downloaded to a temporary location, move it
                         if temp_dest != dest:
@@ -392,7 +404,7 @@ if __name__ == "__main__":
                         sys.exit()
 
             except Exception, e:
-                print str(e)
+                xbmc.log('script.remote_downloader: ' + str(e))
                 error = True
                 sleep = 10
                 errno = 0
@@ -423,13 +435,13 @@ if __name__ == "__main__":
             if error:
                 errors += 1
                 count  += 1
-                print '%d Error(s) whilst downloading %s' % (count, dest)
+                xbmc.log('script.remote_downloader: ' + '%d Error(s) whilst downloading %s'.format(count, dest))
                 xbmc.sleep(sleep*1000)
 
             if (resumable and errors > 0) or errors >= 10:
                 if (not resumable and resume >= 50) or resume >= 500:
                     #Give up!
-                    print '%s download canceled - too many error whilst downloading' % (dest)
+                    xbmc.log('script.remote_downloader: ' + '%s download canceled - too many error whilst downloading'.format(dest))
                     done(title, dest, False)
                     sys.exit()
 
@@ -438,7 +450,7 @@ if __name__ == "__main__":
                 if resumable:
                     chunks  = []
                     #create new response
-                    print 'Download resumed (%d) %s' % (resume, dest)
+                    xbmc.log('script.remote_downloader: ' + 'Download resumed (%d) %s'.format(resume, dest))
                     resp, _, _ = resp_content_resumable(url, headers, total, title, url0)
                 else:
                     #use existing response
