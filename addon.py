@@ -51,7 +51,7 @@ def resp_content_resumable(url, headers, size, title, url0):
     try:
         if size > 0:
             size = int(size)
-            headers['Range'] = 'bytes=%d-' % size
+            headers['Range'] = 'bytes={0}-'.format(size)
 
         req = urllib2.Request(url, headers=headers)
         resp = urllib2.urlopen(req, timeout=30)
@@ -208,8 +208,6 @@ def modify_addons(msg_fmt='ok'):
         new += "\t\t\t\tinfo = {'url': line['video'], 'image': line['thumbnail'], 'title': title}\n"
         new += "\t\t\t\tcommand.append(('Download', 'RunScript(script.remote_downloader, {0})'.format(urllib.quote_plus(str(info)))))\n"
         new += "\t\t\t\tli.addContextMenuItems(command)"
-        # new = "command.append(('Download', ))"
-        # new = "if line['source'] == 'plugin.video.exodus':\n\t\t\t\t\tcommand.append(('Download with Exodus', 'RunScript(script.exodus_downloader, {0})'.format(urllib.quote_plus(str(line)))))\n\t\t\t\tli.addContextMenuItems(command)"
         if old in text and new not in text:
             # text = text.replace(new, old)
             text = text.replace(old, new)
@@ -298,8 +296,8 @@ def getJsonRemote(host, port, username, password, method, parameters):
     req = urllib2.Request(url, data, headers)
     if username and password:
         # format the provided username & password and add them to the request header
-        base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
-        req.add_header("Authorization", "Basic %s" % base64string)
+        base64string = base64.encodestring('{0}:{1}'.format(username, password)).replace('\n', '')
+        req.add_header("Authorization", "Basic {0}".format(base64string))
 
     # send the command
     try:
@@ -376,7 +374,7 @@ if __name__ == "__main__":
 
     # ask for approval
     if not preapproved:
-        if xbmcgui.Dialog().yesno(title + ' - Confirm Download', transname, 'Complete file is %dMB' % mb, 'Continue with download?', 'Confirm',  'Cancel') == 1:
+        if xbmcgui.Dialog().yesno(title + ' - Confirm Download', transname, 'Complete file is {0}MB'.format(mb), 'Continue with download?', 'Confirm',  'Cancel') == 1:
             sys.exit()
 
     # don't download it locally --> send it to another Kodi
@@ -461,7 +459,7 @@ if __name__ == "__main__":
                             del c
 
                         f.close()
-                        xbmc.log('script.remote_downloader: ' + '%s download complete'.format(dest))
+                        xbmc.log('script.remote_downloader: ' + '{0} download complete'.format(dest))
 
                         # if it was downloaded to a temporary location, move it
                         if temp_dest != dest:
@@ -507,13 +505,13 @@ if __name__ == "__main__":
             if error:
                 errors += 1
                 count  += 1
-                xbmc.log('script.remote_downloader: ' + '%d Error(s) whilst downloading %s'.format(count, dest))
+                xbmc.log('script.remote_downloader: ' + '{0} Error(s) whilst downloading {1}'.format(count, dest))
                 xbmc.sleep(sleep*1000)
 
             if (resumable and errors > 0) or errors >= 10:
                 if (not resumable and resume >= 50) or resume >= 500:
                     #Give up!
-                    xbmc.log('script.remote_downloader: ' + '%s download canceled - too many error whilst downloading'.format(dest))
+                    xbmc.log('script.remote_downloader: ' + '{0} download canceled - too many error whilst downloading'.format(dest))
                     done(title, dest, False)
                     sys.exit()
 
@@ -522,7 +520,7 @@ if __name__ == "__main__":
                 if resumable:
                     chunks  = []
                     #create new response
-                    xbmc.log('script.remote_downloader: ' + 'Download resumed (%d) %s'.format(resume, dest))
+                    xbmc.log('script.remote_downloader: ' + 'Download resumed ({0}) {1}'.format(resume, dest))
                     resp, _, _ = resp_content_resumable(url, headers, total, title, url0)
                 else:
                     #use existing response
