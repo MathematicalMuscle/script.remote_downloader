@@ -435,7 +435,7 @@ if __name__ == "__main__":
             percent = min(100 * downloaded / content, 100)
             if percent >= notify:
                 # show a notification of the download progress
-                xbmc.executebuiltin("XBMC.Notification(%s,%s,%i,%s)".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000, image))
+                xbmc.executebuiltin("XBMC.Notification({0},{1},{2},{3})".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000, image))
 
                 # send a notification to the Kodi that sent the download command
                 if local_ip is not None:
