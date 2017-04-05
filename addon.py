@@ -335,6 +335,26 @@ if __name__ == "__main__":
         modify_addons(msg_fmt='notification')
         sys.exit()
 
+    # if we're going to download remotely, make sure the remote Kodi is available
+    if xbmcaddon.Addon('script.remote_downloader').getSetting('download_local') == 'false':
+        # get info from the settings about the remote Kodi
+        ip = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_ip_address')
+        port = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_port')
+        username = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_username')
+        password = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_password')
+
+        # JSON RPC parameters for running `Remote Downloader` in silent update mode on the remote Kodi
+        method = 'Addons.ExecuteAddon'
+        parameters = {"addonid": "script.remote_downloader", "params": {"streaminfo": "{0}".format(
+            urllib.quote_plus(str({'modify_addons_silent': True})))}}
+
+        # silently update the remote Kodi
+        results = getJsonRemote(ip, port, username, password, method, parameters)
+
+        if results != 'OK':
+            xbmcgui.Dialog().ok('Remote Downloader', 'Download cannot be started because the remote Kodi is unavailable.')
+            sys.exit()
+
     # provided parameters
     image = params.get('image')
     title = params.get('title')
@@ -379,12 +399,6 @@ if __name__ == "__main__":
 
     # don't download it locally --> send it to another Kodi
     if xbmcaddon.Addon('script.remote_downloader').getSetting('download_local') == 'false':
-        # get info from the settings about the remote Kodi
-        ip = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_ip_address')
-        port = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_port')
-        username = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_username')
-        password = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_password')
-
         # get info via JSON RPC about the current Kodi
         local_username = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverusername"}, "id":1}'))['result']['value']
         local_password = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverpassword"}, "id":1}'))['result']['value']
