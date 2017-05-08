@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.remote_downloader" name="Remote Downloader" version="0.0.12" provider-name="Mathematical Muscle">
+<addon id="script.remote_downloader" name="Remote Downloader" version="0.0.13" provider-name="Mathematical Muscle">
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>
         <import addon="script.common.plugin.cache" version="0.9.1" />
@@ -27,5 +27,6 @@
         v0.0.10 (2017-04-04) - Fixed a typo
         v0.0.11 (2017-04-04) - String formatting
         v0.0.12 (2017-04-04) - Make sure the remote Kodi is available before trying to download
+        v0.0.13 (2017-05-08) - Don't start the download unless 'Confirm' is selected (hitting the back button won't start it)
     </news>
 </addon>
