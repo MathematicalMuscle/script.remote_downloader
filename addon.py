@@ -394,7 +394,7 @@ if __name__ == "__main__":
 
     # ask for approval
     if not preapproved:
-        if xbmcgui.Dialog().yesno(title + ' - Confirm Download', transname, 'Complete file is {0}MB'.format(mb), 'Continue with download?', 'Confirm',  'Cancel') != 0:
+        if xbmcgui.Dialog().yesno('Remote Downloader', transname, 'Complete file is {0}MB'.format(mb), 'Continue with download?', 'Confirm',  'Cancel') != 0:
             sys.exit()
 
     # don't download it locally --> send it to another Kodi
