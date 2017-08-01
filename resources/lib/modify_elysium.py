@@ -35,6 +35,7 @@ def modify(msg_fmt='ok'):
 
         # set Elysium settings
         xbmcaddon.Addon('plugin.video.elysium').setSetting('downloads', 'true')
+        xbmcaddon.Addon('plugin.video.elysium').setSetting('hosts.mode', '1')
         if xbmcaddon.Addon('plugin.video.elysium').getSetting('movie.download.path') == "":
             xbmcaddon.Addon('plugin.video.elysium').setSetting('movie.download.path', xbmcaddon.Addon('script.remote_downloader').getSetting('local_movies_folder'))
         if xbmcaddon.Addon('plugin.video.elysium').getSetting('tv.download.path') == "":

@@ -35,6 +35,7 @@ def modify(msg_fmt='ok'):
 
         # set Covenant settings
         xbmcaddon.Addon('plugin.video.covenant').setSetting('downloads', 'true')
+        xbmcaddon.Addon('plugin.video.covenant').setSetting('hosts.mode', '1')
         if xbmcaddon.Addon('plugin.video.covenant').getSetting('movie.download.path') == "":
             xbmcaddon.Addon('plugin.video.covenant').setSetting('movie.download.path', xbmcaddon.Addon('script.remote_downloader').getSetting('local_movies_folder'))
         if xbmcaddon.Addon('plugin.video.covenant').getSetting('tv.download.path') == "":
