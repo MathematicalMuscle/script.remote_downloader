@@ -245,6 +245,8 @@ if __name__ == "__main__":
         # get info for the current video and download it
         info = get_now_playing()
         url = info['file']
+        if url == '':
+            sys.exit()
 
         # Movie
         if info['type'] == 'movie' and info['label']:
@@ -410,7 +412,7 @@ if __name__ == "__main__":
                 if image:
                     xbmc.executebuiltin("XBMC.Notification({0},{1},{2},{3})".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000, image))
                 else:
-                    xbmc.executebuiltin("XBMC.Notification({0},{1},{2},{3})".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000))
+                    xbmc.executebuiltin("XBMC.Notification({0},{1},{2})".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000))
 
                 # send a notification to the Kodi that sent the download command
                 if local_ip is not None:
