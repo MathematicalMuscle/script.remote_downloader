@@ -203,19 +203,98 @@ def getJsonRemote(host, port, username, password, method, parameters):
     return response
 
 
+def to_jsonrpc(params_dict):
+    return {"addonid": "script.remote_downloader", "params": {"streaminfo": "{0}".format(urllib.quote_plus(str(params_dict)))}}
+
+
+def from_jsonrpc(parameters):
+    return eval(urllib.unquote_plus(parameters).replace('streaminfo=', ''))
+
+def get_now_playing():
+    """
+    Get info about the currently played file via JSON-RPC.
+
+    https://stackoverflow.com/a/38436735/8023447
+
+    :return: currently played item's data
+    :rtype: dict
+    """
+    request = json.dumps({'jsonrpc': '2.0',
+                          'method': 'Player.GetItem',
+                          'params': {'playerid': 1,
+                                     'properties': ['file', 'showtitle', 'season', 'episode']},
+                          'id': '1'})
+    return eval(json.dumps(json.loads(xbmc.executeJSONRPC(request))['result']['item']))
+
+
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         # modify addons and exit
         modify_addons()
         sys.exit()
 
-    params = eval(urllib.unquote_plus(sys.argv[1]).replace('streaminfo=', ''))
+    params = from_jsonrpc(sys.argv[1])
     xbmc.log('script.remote_downloader: ' + str(params))
 
     if params.get('modify_addons_silent') is not None:
         # modify addons silently and exit
         modify_addons(msg_fmt='notification')
         sys.exit()
+
+    if params.get('download_now_playing') is not None:
+        # get info for the current video and download it
+        info = get_now_playing()
+        url = info['file']
+
+        # Movie
+        if info['type'] == 'movie' and info['label']:
+            title = info['label']
+        # TV
+        elif info['type'] == 'episode' and info['showtitle'] and info['season'] != '-1' and info['episode'] != '-1':
+            title = '{0} S{1:02d}E{2:02d}'.format(info['showtitle'], int(info['season']), int(info['episode']))
+
+        # ask the user
+        else:
+            x = xbmcgui.Dialog().select('Movie or TV Show?', ['Movie', 'TV Show'])
+
+            # Movie
+            if x == 0:
+                title = xbmcgui.Dialog().input('Enter movie name:')
+
+            # TV
+            elif x == 1:
+                showtitle = xbmcgui.Dialog().input('Enter show title:')
+                if showtitle == '':
+                    sys.exit()
+
+                season = xbmcgui.Dialog().input('Enter season:')
+                if season == '':
+                    sys.exit()
+
+                episode = xbmcgui.Dialog().input('Enter episode number:')
+                if episode == '':
+                    sys.exit()
+
+                # try to zero pad the season and episode
+                try:
+                    season = "{0:02d}".format(int(season))
+                except:
+                    pass
+                try:
+                    episode = "{0:02d}".format(int(episode))
+                except:
+                    pass
+
+                title = "{0} S{1}E{2}".format(showtitle, season, episode)
+
+            else:
+                sys.exit()
+
+            if title == '':
+                sys.exit()
+
+        # download the current video
+        xbmc.executebuiltin("RunScript(script.remote_downloader, {0})".format(urllib.quote_plus(str({'title': title, 'url': url}))))
 
     # if we're going to download remotely, make sure the remote Kodi is available
     if xbmcaddon.Addon('script.remote_downloader').getSetting('download_local') == 'false':
@@ -227,8 +306,7 @@ if __name__ == "__main__":
 
         # JSON RPC parameters for running `Remote Downloader` in silent update mode on the remote Kodi
         method = 'Addons.ExecuteAddon'
-        parameters = {"addonid": "script.remote_downloader", "params": {"streaminfo": "{0}".format(
-            urllib.quote_plus(str({'modify_addons_silent': True})))}}
+        parameters = to_jsonrpc({'modify_addons_silent': True})
 
         # silently update the remote Kodi
         results = getJsonRemote(ip, port, username, password, method, parameters)
@@ -288,7 +366,7 @@ if __name__ == "__main__":
 
         # JSON RPC parameters for downloading the stream
         method = 'Addons.ExecuteAddon'
-        parameters = {"addonid":"script.remote_downloader", "params":{"streaminfo": "{0}".format(urllib.quote_plus(str({'title': title, 'image': image, 'url': url, 'preapproved': True, 'local_ip': xbmc.getIPAddress(), 'local_password': local_password, 'local_username': local_username, 'local_port': local_port})))}}
+        parameters = to_jsonrpc({'title': title, 'image': image, 'url': url, 'preapproved': True, 'local_ip': xbmc.getIPAddress(), 'local_password': local_password, 'local_username': local_username, 'local_port': local_port})
 
         # make the remote Kodi download the stream
         results = getJsonRemote(ip, port, username, password, method, parameters)
@@ -329,12 +407,19 @@ if __name__ == "__main__":
             percent = min(100 * downloaded / content, 100)
             if percent >= notify:
                 # show a notification of the download progress
-                xbmc.executebuiltin("XBMC.Notification({0},{1},{2},{3})".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000, image))
+                if image:
+                    xbmc.executebuiltin("XBMC.Notification({0},{1},{2},{3})".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000, image))
+                else:
+                    xbmc.executebuiltin("XBMC.Notification({0},{1},{2},{3})".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000))
 
                 # send a notification to the Kodi that sent the download command
                 if local_ip is not None:
-                    parameters = {'title': title + ' - Download Progress - ' + str(percent) + '%',
-                                  'message': dest, 'image': image, 'displaytime': 10000}
+                    if image:
+                        parameters = {'title': title + ' - Download Progress - ' + str(percent) + '%',
+                                      'message': dest, 'image': image, 'displaytime': 10000}
+                    else:
+                        parameters = {'title': title + ' - Download Progress - ' + str(percent) + '%',
+                                      'message': dest, 'displaytime': 10000}
                     results = getJsonRemote(local_ip, int(local_port), local_username, local_password, "GUI.ShowNotification", parameters)
                     xbmc.log('script.remote_downloader: ' + str(results))
 
