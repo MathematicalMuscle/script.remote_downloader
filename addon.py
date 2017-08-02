@@ -222,7 +222,7 @@ def get_now_playing():
     request = json.dumps({'jsonrpc': '2.0',
                           'method': 'Player.GetItem',
                           'params': {'playerid': 1,
-                                     'properties': ['file', 'showtitle', 'season', 'episode']},
+                                     'properties': ['file', 'showtitle', 'season', 'episode', 'thumbnail']},
                           'id': '1'})
     return eval(json.dumps(json.loads(xbmc.executeJSONRPC(request))['result']['item']))
 
@@ -246,7 +246,7 @@ if __name__ == "__main__":
         try:
             info = get_now_playing()
         except:
-            info = {'file': xbmc.getInfoLabel('Player.Filenameandpath'), 'showtitle': xbmc.getInfoLabel('Player.Title'), 'label': xbmc.getInfoLabel('Player.Title'), 'type': ''}
+            info = {'file': xbmc.getInfoLabel('Player.Filenameandpath'), 'showtitle': xbmc.getInfoLabel('Player.Title'), 'label': xbmc.getInfoLabel('Player.Title'), 'type': '', 'thumbnail': xbmc.getInfoLabel('Player.Art(thumb)')}
 
         url = info['file']
         if url == '':
@@ -299,7 +299,7 @@ if __name__ == "__main__":
                 sys.exit()
 
         # download the current video
-        xbmc.executebuiltin("RunScript(script.remote_downloader, {0})".format(urllib.quote_plus(str({'title': title, 'url': url}))))
+        xbmc.executebuiltin("RunScript(script.remote_downloader, {0})".format(urllib.quote_plus(str({'title': title, 'url': url, 'image': info['thumbnail']}))))
 
     # if we're going to download remotely, make sure the remote Kodi is available
     if xbmcaddon.Addon('script.remote_downloader').getSetting('download_local') == 'false':
