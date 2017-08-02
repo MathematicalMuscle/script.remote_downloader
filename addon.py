@@ -243,7 +243,11 @@ if __name__ == "__main__":
 
     if params.get('download_now_playing') is not None:
         # get info for the current video and download it
-        info = get_now_playing()
+        try:
+            info = get_now_playing()
+        except:
+            info = {'file': xbmc.getInfoLabel('Player.Filenameandpath'), 'showtitle': xbmc.getInfoLabel('Player.Title'), 'label': xbmc.getInfoLabel('Player.Title'), 'type': ''}
+
         url = info['file']
         if url == '':
             sys.exit()
@@ -261,11 +265,13 @@ if __name__ == "__main__":
 
             # Movie
             if x == 0:
-                title = xbmcgui.Dialog().input('Enter movie name:')
+                title = xbmcgui.Dialog().input('Enter movie name:', info['label'])
+                if title == '':
+                    sys.exit()
 
             # TV
             elif x == 1:
-                showtitle = xbmcgui.Dialog().input('Enter show title:')
+                showtitle = xbmcgui.Dialog().input('Enter show title:', info['showtitle'])
                 if showtitle == '':
                     sys.exit()
 
@@ -290,9 +296,6 @@ if __name__ == "__main__":
                 title = "{0} S{1}E{2}".format(showtitle, season, episode)
 
             else:
-                sys.exit()
-
-            if title == '':
                 sys.exit()
 
         # download the current video
