@@ -255,6 +255,11 @@ if __name__ == "__main__":
         # Movie
         if info['type'] == 'movie' and info['label']:
             title = info['label']
+            if title[-1] != ')' or title[-5:-3] not in ['19', '20']:
+                year = xbmc.getInfoLabel('VideoPlayer.Year')
+                if year is not None and len(year) == 4 and year[:2] in ['19', '20']:
+                    title += ' ({0})'.format(year)
+
         # TV
         elif info['type'] == 'episode' and info['showtitle'] and info['season'] != '-1' and info['episode'] != '-1':
             title = '{0} S{1:02d}E{2:02d}'.format(info['showtitle'], int(info['season']), int(info['episode']))
