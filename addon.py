@@ -265,13 +265,19 @@ if __name__ == "__main__":
 
             # Movie
             if x == 0:
-                title = xbmcgui.Dialog().input('Enter movie name:', info['label'])
+                if len(info['label']) < 25 or ' ' in info['label']:
+                    title = xbmcgui.Dialog().input('Enter movie name:', info['label'])
+                else:
+                    title = xbmcgui.Dialog().input('Enter movie name:')
                 if title == '':
                     sys.exit()
 
             # TV
             elif x == 1:
-                showtitle = xbmcgui.Dialog().input('Enter show title:', info['showtitle'])
+                if len(info['showtitle']) < 25 or ' ' in info['showtitle']:
+                    showtitle = xbmcgui.Dialog().input('Enter show title:', info['showtitle'])
+                else:
+                    showtitle = xbmcgui.Dialog().input('Enter show title:')
                 if showtitle == '':
                     sys.exit()
 
@@ -389,6 +395,18 @@ if __name__ == "__main__":
         dest, temp_dest = get_dest(title, url0)
         if dest is None:
             sys.exit()
+
+        if os.path.exists(dest):
+            i = 2
+            while True:
+                # add "(i)" to the end of the filename and check if it exists
+                new_dest = dest.split('.')
+                new_dest = '.'.join(new_dest[:-1]) + ' ({0}).'.format(i) + new_dest[-1]
+                if not os.path.exists(new_dest):
+                    dest = new_dest
+                    break
+                else:
+                    i += 1
 
         # download-tracking variables
         total = 0

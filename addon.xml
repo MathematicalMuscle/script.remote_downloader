@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.remote_downloader" name="Remote Downloader" version="0.0.20" provider-name="Mathematical Muscle">
+<addon id="script.remote_downloader" name="Remote Downloader" version="0.0.21" provider-name="Mathematical Muscle">
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>
         <import addon="script.common.plugin.cache" version="0.9.1" />
@@ -35,5 +35,6 @@
         v0.0.18 (2017-08-02) - Fixed downloading of current stream
         v0.0.19 (2017-08-02) - Improved handling of media info
         v0.0.20 (2017-08-02) - Get a stream's thumbnail
+        v0.0.21 (2017-08-10) - Don't overwrite an existing file
     </news>
 </addon>
