@@ -242,7 +242,7 @@ if __name__ == "__main__":
     title_regex_substitutions = 'special://userdata/addon_data/script.remote_downloader/title_regex_substitutions.txt'
     if not xbmcvfs.exists(title_regex_substitutions):
         with open(xbmc.translatePath(title_regex_substitutions), 'w') as f:
-            f.write('# enter regular expressions here\n# EXAMPLE: re.sub(r"^Old Title (S[0-9]+\s?E[0-9]+)\\Z", r"New Title \\1", s)')
+            f.write('# enter regular expressions here\n# EXAMPLE: re.sub("^Old Title (S[0-9]+\\s?E[0-9]+)\\Z", "New Title \\1", s)')
 
     if len(sys.argv) == 1:
         # modify addons and exit
