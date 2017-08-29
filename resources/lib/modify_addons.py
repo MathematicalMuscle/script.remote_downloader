@@ -1,8 +1,3 @@
-import xbmc
-import xbmcaddon
-import xbmcgui
-import xbmcvfs
-
 from . import create_callbacks
 from . import modify_covenant
 from . import modify_elysium

@@ -17,53 +17,61 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgctxt "#32000"
-msgid "General"
+msgid "This Kodi"
 msgstr ""
 
 msgctxt "#32001"
-msgid "Local Kodi"
-msgstr ""
-
-msgctxt "#32002"
 msgid "Download to this device?"
 msgstr ""
 
-msgctxt "#32003"
+msgctxt "#32002"
 msgid "Local movies download folder:"
 msgstr ""
 
+msgctxt "#32003"
+msgid "Download each movie into its own folder?"
+msgstr ""
+
 msgctxt "#32004"
-msgid "Local tv download folder:"
+msgid "Local TV download folder:"
 msgstr ""
 
 msgctxt "#32005"
 msgid "Local temp download folder:"
 msgstr ""
 
-msgctxt "#32006"
-msgid "Remote Kodi"
+msgctxt "#32010"
+msgid "Remote Kodi 1"
 msgstr ""
 
-msgctxt "#32007"
+msgctxt "#320011"
 msgid "Remote IP address:"
 msgstr ""
 
-msgctxt "#32008"
+msgctxt "#32012"
 msgid "Remote username:"
 msgstr ""
 
-msgctxt "#32009"
+msgctxt "#32013"
 msgid "Remote password:"
 msgstr ""
 
-msgctxt "#32010"
+msgctxt "#32014"
 msgid "Remote port:"
 msgstr ""
 
-msgctxt "#32011"
-msgid "Download each movie into its own folder?"
+msgctxt "#32020"
+msgid "Remote Kodi 2"
 msgstr ""
 
-msgctxt "#32012"
-msgid "Update library after each download finishes?"
+msgctxt "#32030"
+msgid "Remote Kodi 3"
+msgstr ""
+
+msgctxt "#32040"
+msgid "Remote Kodi 4"
+msgstr ""
+
+msgctxt "#32050"
+msgid "Remote Kodi 5"
 msgstr ""

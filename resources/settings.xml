@@ -1,19 +1,46 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
   <category label="32000">
-    <setting label="32012" id="update_library" type="bool" default="true"/>
     <!-- Local Kodi -->
-    <setting label="32001" type="lsep"/>
-    <setting label="32002" id="download_local" type="bool" default="true"/>
-    <setting label="32003" id="local_movies_folder" type="folder" source="videos"/>
-    <setting label="32011" id="local_movies_own_folder" type="bool" default="false"/>
+    <setting label="32001" id="download_local" type="select" values="Yes|No|If remote unavailable" default="No"/>
+    <setting label="32002" id="local_movies_folder" type="folder" source="videos"/>
+    <setting label="32003" id="local_movies_own_folder" type="bool" default="false"/>
     <setting label="32004" id="local_tv_folder" type="folder" source="videos"/>
     <setting label="32005" id="local_temp_folder" type="folder" source="auto" value=""/>
-    <!-- Remote Kodi -->
-    <setting label="32006" type="lsep"/>
-    <setting label="32007" id="remote_ip_address" type="ipaddress"/>
-    <setting label="32008" id="remote_username" type="text" default="kodi"/>
-    <setting label="32009" id="remote_password" type="text" default=""/>
-    <setting label="32010" id="remote_port" type="number" default="8080"/>
+  </category>
+  <!-- Remote Kodi #1 -->
+  <category label="32010">
+    <setting label="32012" id="remote_ip_address1" type="ipaddress"/>
+    <setting label="32013" id="remote_username1" type="text" default="kodi"/>
+    <setting label="32014" id="remote_password1" type="text" default=""/>
+    <setting label="32015" id="remote_port1" type="number" default="8080"/>
+  </category>
+  <!-- Remote Kodi #2 -->
+  <category label="32020">
+    <setting label="32012" id="remote_ip_address2" type="ipaddress"/>
+    <setting label="32013" id="remote_username2" type="text" default="kodi"/>
+    <setting label="32014" id="remote_password2" type="text" default=""/>
+    <setting label="32015" id="remote_port2" type="number" default="8080"/>
+  </category>
+  <!-- Remote Kodi #3 -->
+  <category label="32030">
+    <setting label="32012" id="remote_ip_address3" type="ipaddress"/>
+    <setting label="32013" id="remote_username3" type="text" default="kodi"/>
+    <setting label="32014" id="remote_password3" type="text" default=""/>
+    <setting label="32015" id="remote_port3" type="number" default="8080"/>
+  </category>
+  <!-- Remote Kodi #4 -->
+  <category label="32040">
+    <setting label="32012" id="remote_ip_address4" type="ipaddress"/>
+    <setting label="32013" id="remote_username4" type="text" default="kodi"/>
+    <setting label="32014" id="remote_password4" type="text" default=""/>
+    <setting label="32015" id="remote_port4" type="number" default="8080"/>
+  </category>
+  <!-- Remote Kodi #5 -->
+  <category label="32050">
+    <setting label="32012" id="remote_ip_address5" type="ipaddress"/>
+    <setting label="32013" id="remote_username5" type="text" default="kodi"/>
+    <setting label="32014" id="remote_password5" type="text" default=""/>
+    <setting label="32015" id="remote_port5" type="number" default="8080"/>
   </category>
 </settings>
