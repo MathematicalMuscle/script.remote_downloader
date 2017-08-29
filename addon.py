@@ -112,7 +112,7 @@ if __name__ == "__main__":
     #                3. Prepare download                 #
     #                                                    #
     # ================================================== #
-    if action == 'prepare_download' or action is None:
+    if action == 'prepare_download':
         # provided parameters
         image = params.get('image')
         title = name_functions.title_substitutions(params.get('title'))
@@ -163,9 +163,9 @@ if __name__ == "__main__":
                     if result == 'OK':
                         # get info via JSON RPC about the current Kodi
                         requesting_ip = xbmc.getIPAddress()
-                        requesting_port = json_functions.jsonrpc(method="Settings.GetSettingValue", params={"setting": "services.webserverport"})
-                        requesting_username = json_functions.jsonrpc(method="Settings.GetSettingValue", params={"setting": "services.webserverusername"})
-                        requesting_password = json_functions.jsonrpc(method="Settings.GetSettingValue", params={"setting": "services.webserverpassword"})
+                        requesting_port = json_functions.jsonrpc(method="Settings.GetSettingValue", params={"setting": "services.webserverport"})['value']
+                        requesting_username = json_functions.jsonrpc(method="Settings.GetSettingValue", params={"setting": "services.webserverusername"})['value']
+                        requesting_password = json_functions.jsonrpc(method="Settings.GetSettingValue", params={"setting": "services.webserverpassword"})['value']
 
                         params = {'title': title, 'url': url, 'image': image, 'url0': url0, 'headers': headers,
                                   'content': content, 'resumable': resumable, 'action': 'request_download',

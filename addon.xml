@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.remote_downloader" name="Remote Downloader" version="0.0.23" provider-name="Mathematical Muscle">
+<addon id="script.remote_downloader" name="Remote Downloader" version="0.0.24" provider-name="Mathematical Muscle">
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>
         <import addon="script.common.plugin.cache" version="0.9.1" />
@@ -38,5 +38,6 @@
         v0.0.21 (2017-08-10) - Don't overwrite an existing file
         v0.0.22 (2017-08-10) - Include the year in movie filenames
         v0.0.23 (2017-08-21) - Enabled custom regex substitutions in titles
+        v0.0.24 (2017-08-29) - Enabled multiple remote Kodi systems and local downloading if none are available
     </news>
 </addon>

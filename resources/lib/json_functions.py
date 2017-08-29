@@ -18,20 +18,16 @@ password = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Setting
 port = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverport"}, "id":1}'))['result']['value']
 
 
-def jsonrpc(method, params=None, addonid=None, ip=ip, username=username, password=password, port=port):
+def jsonrpc(method, params=None, addonid=None, ip=ip, port=port, username=username, password=password):
     url = 'http://{0}:{1}/jsonrpc'.format(ip, port)
 
     # build out the Data to be sent
     payload = {'jsonrpc': '2.0', 'method': method, 'id': '1'}
 
-    if addonid:
-        payload["params"] = {"addonid": addonid}
-
-        if params is not None:
-            payload["params"]["params"] = {"streaminfo": "{0}".format(urllib.quote_plus(str(params)))}
-
-    elif params is not None:
-        payload["params"] = {"streaminfo": "{0}".format(urllib.quote_plus(str(params)))}
+    if params is not None and addonid == 'script.remote_downloader':
+        payload["params"] = {"addonid": "script.remote_downloader", "params": {"streaminfo": "{0}".format(urllib.quote_plus(str(params)))}}
+    else:
+        payload["params"] = params
 
     headers = {"Content-Type": "application/json"}
 

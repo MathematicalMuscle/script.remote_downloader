@@ -37,8 +37,7 @@ def process_now_playing():
     image = info['thumbnail']
 
     # Movie
-    #if info['type'] == 'movie' and info['label']:
-    if info['label'] and info['season'] == '-1' and info['episode'] == '-1':
+    if info['type'] == 'movie' and info['label']:
         title = info['label']
         if title[-1] != ')' or title[-5:-3] not in ['19', '20']:
             year = xbmc.getInfoLabel('VideoPlayer.Year')
@@ -46,8 +45,7 @@ def process_now_playing():
                 title += ' ({0})'.format(year)
 
     # TV
-    #elif info['type'] == 'episode' and info['showtitle'] and info['season'] != '-1' and info['episode'] != '-1':
-    elif info['showtitle'] and info['season'] != '-1' and info['episode'] != '-1':
+    elif info['type'] == 'episode' and info['showtitle'] and info['season'] != '-1' and info['episode'] != '-1':
         title = '{0} S{1:02d}E{2:02d}'.format(info['showtitle'], int(info['season']), int(info['episode']))
 
     # ask the user
