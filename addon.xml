@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.remote_downloader" name="Remote Downloader" version="0.1.2" provider-name="Mathematical Muscle">
+<addon id="script.remote_downloader" name="Remote Downloader" version="0.1.3" provider-name="Mathematical Muscle">
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>
         <import addon="script.common.plugin.cache" version="0.9.1" />
@@ -42,5 +42,6 @@
         v0.1.0  (2017-08-29) - Bug fixes, multiple remote Kodi systems now works
         v0.1.1  (2017-08-29) - Fixed some minor typos
         v0.1.2  (2017-08-29) - Fixed settings labels
+        v0.1.3  (2017-08-30) - Fixed a typo in the settings labels
     </news>
 </addon>

@@ -48,7 +48,7 @@ msgctxt "#32010"
 msgid "Remote Kodi 1"
 msgstr ""
 
-msgctxt "#320011"
+msgctxt "#32011"
 msgid "Remote IP address:"
 msgstr ""
 
