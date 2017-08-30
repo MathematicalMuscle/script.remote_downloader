@@ -210,7 +210,7 @@ if __name__ == "__main__":
         method = 'Addons.ExecuteAddon'
 
         # send a download request to the downloading system
-        if xbmcaddon.Addon('script.remote_downloader').getSetting('download_local') == 'Yes':
+        if True or xbmcaddon.Addon('script.remote_downloader').getSetting('download_local') == 'Yes':
             params = {'action': 'request_download', 'title': title, 'url': url, 'image': image, 'content': content}
             result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
             sys.exit()
@@ -500,8 +500,10 @@ if __name__ == "__main__":
         # determine whether the file can be downloaded
         headers = simple.get_headers(url)
         content, size, mb = simple.get_content_size_mb(content)
-        resp, _, resumable = helper_functions.resp_content_resumable(url, headers, size, title)
-        if resp is None:
+        resp, _, resumable = helper_functions.resp_content_resumable(url, headers, 0, title)
+        dest, temp_dest = name_functions.get_dest(title, url)
+
+        if resp is None or dest is None:
             sys.exit()
 
         # download-tracking variables
@@ -511,11 +513,6 @@ if __name__ == "__main__":
         count = 0
         resume = 0
         sleep = 0
-
-        # get the destination path
-        dest, temp_dest = name_functions.get_dest(title, url)
-        if dest is None:
-            sys.exit()
 
         f = xbmcvfs.File(temp_dest, 'w')
 

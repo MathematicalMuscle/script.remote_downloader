@@ -10,20 +10,22 @@ import urllib2
 import urlparse
 
 from . import name_functions
+from . import simple
 
 
-def resp_content_resumable(url, headers, size, title=None):
+def resp_content_resumable(url, headers, size=0, title=None):
+    url0 = simple.get_url0(url)
     try:
         if size > 0:
             size = int(size)
             headers['Range'] = 'bytes={0}-'.format(size)
 
-        req = urllib2.Request(url, headers=headers)
+        req = urllib2.Request(url0, headers=headers)
         resp = urllib2.urlopen(req, timeout=30)
 
     except:
         if title is not None:
-            url0 = get_url0(url)
+            #url0 = get_url0(url)
             dest, _ = name_functions.get_dest(title, url0, look_for_duplicates=False)
             xbmcgui.Dialog().ok(title, dest, 'Download failed', 'No response from server')
         return None, None, None
