@@ -543,8 +543,7 @@ if __name__ == "__main__":
                     else:
                         _params = {'title': title + ' - Download Progress - ' + str(percent) + '%',
                                    'message': dest, 'displaytime': 10000}
-                    result = json_functions.jsonrpc(method, params, None,
-                                                    r_ip, r_port, r_user, r_pass)
+                    result = json_functions.jsonrpc(method, _params, None, r_ip, r_port, r_user, r_pass)
 
                 notify += 10
 
@@ -575,7 +574,7 @@ if __name__ == "__main__":
                         method = "VideoLibrary.Scan"
                         update_downloading_library = json_functions.jsonrpc(method)
                         if r_ip is not None:
-                            update_requesting_library = json_functions.jsonrpc(r_ip, r_port, r_user, r_pass, method)
+                            update_requesting_library = json_functions.jsonrpc(method, None, None, r_ip, r_port, r_user, r_pass)
 
                         sys.exit()
 
