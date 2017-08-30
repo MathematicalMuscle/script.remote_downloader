@@ -42,7 +42,7 @@ from resources.lib import now_playing
 from resources.lib import simple
 from resources.lib.modify_addons import modify_addons
 
-import json
+
 # info about this system
 ip = xbmcaddon.Addon('script.remote_downloader').getSetting('local_ip_address')
 if not ip:
@@ -210,7 +210,7 @@ if __name__ == "__main__":
         method = 'Addons.ExecuteAddon'
 
         # send a download request to the downloading system
-        if True or xbmcaddon.Addon('script.remote_downloader').getSetting('download_local') == 'Yes':
+        if xbmcaddon.Addon('script.remote_downloader').getSetting('download_local') == 'Yes':
             params = {'action': 'request_download', 'title': title, 'url': url, 'image': image, 'content': content}
             result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
             sys.exit()
