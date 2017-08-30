@@ -39,7 +39,17 @@ from resources.lib import helper_functions
 from resources.lib import json_functions
 from resources.lib import name_functions
 from resources.lib import now_playing
+from resources.lib import simple
 from resources.lib.modify_addons import modify_addons
+
+import json
+# info about this system
+ip = xbmcaddon.Addon('script.remote_downloader').getSetting('local_ip_address')
+if not ip:
+    ip = xbmc.getIPAddress()
+port = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverport"}, "id":1}'))['result']['value']
+username = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverusername"}, "id":1}'))['result']['value']
+password = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverpassword"}, "id":1}'))['result']['value']
 
 
 if __name__ == "__main__":
@@ -74,7 +84,9 @@ if __name__ == "__main__":
     #                                                    #
     # ================================================== #
     if len(sys.argv) == 1:
-        # modify addons and exit
+        """Modify addons and exit
+
+        """
         modify_addons()
         sys.exit()
 
@@ -88,7 +100,9 @@ if __name__ == "__main__":
     #                                                    #
     # ================================================== #
     if action == 'modify_addons_silent':
-        # modify addons silently and exit
+        """Modify addons silently and exit
+
+        """
         modify_addons(msg_fmt='notification')
         sys.exit()
 
@@ -98,11 +112,27 @@ if __name__ == "__main__":
     #                                                    #
     # ================================================== #
     if action == 'download_now_playing':
-        # get info for the current video and download it
+        """Get info for the current video and download it
+
+        Requesting system
+
+        Returns
+        -------
+        action : str
+            'prepare_download'
+        title : str
+            title of the stream
+        url : str
+            URL for the stream
+        image : str
+            image for the stream
+
+        """
         title, url, image = now_playing.process_now_playing()
+        title = name_functions.get_title(title)
 
         # download the current video
-        params = {'title': title, 'url': url, 'image': image, 'action': 'prepare_download'}
+        params = {'action': 'prepare_download', 'title': title, 'url': url, 'image': image}
         method = 'Addons.ExecuteAddon'
         result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
         sys.exit()
@@ -113,10 +143,54 @@ if __name__ == "__main__":
     #                                                    #
     # ================================================== #
     if action == 'prepare_download':
-        # provided parameters
-        image = params.get('image')
-        title = name_functions.title_substitutions(params.get('title'))
+        """Prepare to download a stream
+
+        Requesting system --> Downloading system
+
+        Parameters
+        ----------
+        action : str
+            'prepare_download'
+        title : str
+            title of the stream
+        url : str
+            URL for the stream
+        image : str
+            image for the stream
+
+        Returns
+        -------
+        action : str
+            'request_download'
+        title : str
+            title of the stream
+        url : str
+            URL for the stream
+        image : str
+            image for the stream
+        content : int
+            file size of the download
+        r_ip : str
+            requesting system IP address (if downloading remotely)
+        r_port : str
+            requesting system port (if downloading remotely)
+        r_user : str
+            requesting system username (if downloading remotely)
+        r_pass : str
+            requesting system password (if downloading remotely)
+        d_ip : str
+            downloading system IP address (if downloading remotely)
+        d_port : str
+            downloading system port (if downloading remotely)
+        d_user : str
+            downloading system username (if downloading remotely)
+        d_pass : str
+            downloading system password (if downloading remotely)
+
+        """
+        title = params.get('title')
         url = params.get('url')
+        image = params.get('image')
 
         # if there is no url, exit
         if url is None:
@@ -124,14 +198,11 @@ if __name__ == "__main__":
             sys.exit()
 
         # derived parameters
-        url0 = url.split('|')[0]
-        try:
-            headers = dict(urlparse.parse_qsl(url.rsplit('|', 1)[1]))
-        except:
-            headers = dict('')
+        url0 = simple.get_url0(url)
+        headers = simple.get_headers(url)
 
         # determine whether the file can be downloaded
-        resp, content, resumable = helper_functions.resp_content_resumable(url0, headers, 0, title, url0)
+        resp, content, resumable = helper_functions.resp_content_resumable(url, headers, 0, title)
         if resp is None and content is None:
             sys.exit()
 
@@ -140,47 +211,30 @@ if __name__ == "__main__":
 
         # send a download request to the downloading system
         if xbmcaddon.Addon('script.remote_downloader').getSetting('download_local') == 'Yes':
-            params = {'title': title, 'url': url, 'image': image, 'url0': url0, 'headers': headers,
-                      'resumable': resumable, 'content': content, 'action': 'request_download'}
-
+            params = {'action': 'request_download', 'title': title, 'url': url, 'image': image, 'content': content}
             result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
             sys.exit()
 
         else:
             for i in range(5):
                 # get info about the downloading Kodi system
-                downloading_ip = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_ip_address{0}'.format(i+1))
-                downloading_port = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_port{0}'.format(i+1))
-                downloading_username = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_username{0}'.format(i+1))
-                downloading_password = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_password{0}'.format(i+1))
+                d_ip = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_ip_address{0}'.format(i+1))
+                d_port = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_port{0}'.format(i+1))
+                d_user = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_username{0}'.format(i+1))
+                d_pass = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_password{0}'.format(i+1))
 
-                if downloading_ip != '':
-                    # make sure the remote Kodi is available
-                    _params = {'action': 'modify_addons_silent'}
-                    result = json_functions.jsonrpc(method, _params, 'script.remote_downloader',
-                                                    downloading_ip, downloading_port, downloading_username, downloading_password)
+                if d_ip != '':
+                    params = {'action': 'request_download', 'title': title, 'url': url, 'image': image,
+                              'content': content, 'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
+                              'r_ip': ip, 'r_port': port, 'r_user': username, 'r_pass': password}
 
+                    result = json_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
                     if result == 'OK':
-                        # get info via JSON RPC about the current Kodi
-                        requesting_ip = xbmc.getIPAddress()
-                        requesting_port = json_functions.jsonrpc(method="Settings.GetSettingValue", params={"setting": "services.webserverport"})['value']
-                        requesting_username = json_functions.jsonrpc(method="Settings.GetSettingValue", params={"setting": "services.webserverusername"})['value']
-                        requesting_password = json_functions.jsonrpc(method="Settings.GetSettingValue", params={"setting": "services.webserverpassword"})['value']
-
-                        params = {'title': title, 'url': url, 'image': image, 'url0': url0, 'headers': headers,
-                                  'content': content, 'resumable': resumable, 'action': 'request_download',
-                                  'downloading_ip': downloading_ip, 'downloading_username': downloading_username, 'downloading_password': downloading_password,
-                                  'downloading_port': downloading_port, 'requesting_ip': requesting_ip, 'requesting_port': requesting_port,
-                                  'requesting_username': requesting_username, 'requesting_password': requesting_password}
-
-                        result = json_functions.jsonrpc(method, params, 'script.remote_downloader',
-                                                        downloading_ip, downloading_port, downloading_username, downloading_password)
                         sys.exit()
 
             # no remote Kodi systems available ==> download it locally?
             if xbmcaddon.Addon('script.remote_downloader').getSetting('download_local') == 'If remote unavailable':
-                params = {'title': title, 'url': url, 'image': image, 'url0': url0, 'headers': headers,
-                          'content': content, 'action': 'request_download'}
+                params = {'action': 'request_download', 'title': title, 'url': url, 'image': image, 'content': content}
 
                 result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
 
@@ -192,48 +246,89 @@ if __name__ == "__main__":
     #                                                    #
     # ================================================== #
     if action == 'request_download':
-        # provided parameters
-        title = name_functions.title_substitutions(params.get('title'))
-        url0 = params.get('url0')
+        """Send a message to the requesting system to confirm or cancel the download
+
+        Downloading system --> requesting system
+
+        Parameters
+        ----------
+        action : str
+            'request_download'
+        title : str
+            title of the stream
+        url : str
+            URL for the stream
+        image : str
+            image for the stream
+        content : int
+            file size of the download
+        d_ip : str
+            downloading system IP address (if downloading remotely)
+        d_port : str
+            downloading system port (if downloading remotely)
+        d_user : str
+            downloading system username (if downloading remotely)
+        d_pass : str
+            downloading system password (if downloading remotely)
+        r_ip : str
+            requesting system IP address (if downloading remotely)
+        r_port : str
+            requesting system port (if downloading remotely)
+        r_user : str
+            requesting system username (if downloading remotely)
+        r_pass : str
+            requesting system password (if downloading remotely)
+
+        Returns
+        -------
+        action : str
+            'confirm_download'
+        title : str
+            title of the stream
+        url : str
+            URL for the stream
+        image : str
+            image for the stream
+        content : int
+            file size of the download
+        d_ip : str
+            downloading system IP address (if downloading remotely)
+        d_port : str
+            downloading system port (if downloading remotely)
+        d_user : str
+            downloading system username (if downloading remotely)
+        d_pass : str
+            downloading system password (if downloading remotely)
+
+        """
+        title = name_functions.get_title(params.get('title'))
+        url = params.get('url')
+        image = params.get('image')
         content = params.get('content')
 
-        # change the action from 'request_download' to 'confirm_download'
-        params['action'] = 'confirm_download'
-
-        # get the name of the file to be created and add it to `params`
-        dest, _ = name_functions.get_dest(title, url0)
-        basename = os.path.basename(dest)
-        params['basename'] = basename
+        # info about the downloading Kodi system
+        d_ip = params.get('d_ip')
+        d_port = params.get('d_port')
+        d_user = params.get('d_user')
+        d_pass = params.get('d_pass')
 
         # info about the requesting Kodi system
-        requesting_ip = params.get('requesting_ip')
-        requesting_username = params.get('requesting_username')
-        requesting_password = params.get('requesting_password')
-        requesting_port = params.get('requesting_port')
-
-        # the size of the file to be created
-        size = 1024 * 1024
-        mb = content / size
-        if content < size:
-            size = content
-        params['mb'] = mb
-        params['size'] = size
-
-        # the name of this system, aka the downloading system
-        kodi_name = xbmc.getInfoLabel('System.FriendlyName')
-        params['kodi_name'] = kodi_name
+        r_ip = params.get('r_ip')
+        r_port = params.get('r_port')
+        r_user = params.get('r_user')
+        r_pass = params.get('r_pass')
 
         # the JSON-RPC method
         method = 'Addons.ExecuteAddon'
 
-        # requesting system == downloading system
-        if not requesting_ip:
-            json_functions.jsonrpc(method, params, 'script.remote_downloader')
+        if r_ip is not None:
+            params = {'action': 'confirm_download', 'title': title, 'url': url, 'image': image, 'content': content,
+                      'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass}
+            json_functions.jsonrpc(method, params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
 
-        # requesting system != downloading system
         else:
-            json_functions.jsonrpc(method, params, 'script.remote_downloader',
-                                   requesting_ip, requesting_port, requesting_username, requesting_password)
+            params = {'action': 'confirm_download', 'title': title, 'url': url, 'image': image, 'content': content}
+            json_functions.jsonrpc(method, params, 'script.remote_downloader')
 
         sys.exit()
 
@@ -243,28 +338,105 @@ if __name__ == "__main__":
     #                                                    #
     # ================================================== #
     if action == 'confirm_download':
-        basename = params.get('basename')
-        kodi_name = params.get('kodi_name')
-        mb = params.get('mb')
+        """Send a message telling the downloading system to download the stream
 
-        if xbmcgui.Dialog().yesno('Remote Downloader', basename, 'Complete file is {0}MB'.format(mb), 'Download to {0}?'.format(kodi_name), 'Confirm',  'Cancel') == 0:
+        Requesting system --> downloading system
+
+        Parameters
+        ----------
+        action : str
+            'confirm_download'
+        title : str
+            title of the stream
+        url : str
+            URL for the stream
+        image : str
+            image for the stream
+        content : int
+            file size of the download
+        d_ip : str
+            downloading system IP address (if downloading remotely)
+        d_port : str
+            downloading system port (if downloading remotely)
+        d_user : str
+            downloading system username (if downloading remotely)
+        d_pass : str
+            downloading system password (if downloading remotely)
+
+        Returns
+        -------
+        action : str
+            'download'
+        title : str
+            title of the stream
+        url : str
+            URL for the stream
+        image : str
+            image for the stream
+        content : int
+            file size of the download
+        d_ip : str
+            downloading system IP address (if downloading remotely)
+        d_port : str
+            downloading system port (if downloading remotely)
+        d_user : str
+            downloading system username (if downloading remotely)
+        d_pass : str
+            downloading system password (if downloading remotely)
+        r_ip : str
+            requesting system IP address (if downloading remotely)
+        r_port : str
+            requesting system port (if downloading remotely)
+        r_user : str
+            requesting system username (if downloading remotely)
+        r_pass : str
+            requesting system password (if downloading remotely)
+
+        """
+        title = params.get('title')
+        url = params.get('url')
+        image = params.get('image')
+        content = params.get('content')
+
+        # info about the downloading Kodi system
+        d_ip = params.get('d_ip')
+        d_port = params.get('d_port')
+        d_user = params.get('d_user')
+        d_pass = params.get('d_pass')
+
+        # info about the requesting Kodi system
+        r_ip = ip
+        r_port = port
+        r_user = username
+        r_pass = password
+
+        # get the name of the downloading Kodi system
+        _params = {"labels": ["System.FriendlyName"]}
+        _method = "XBMC.GetInfoLabels"
+        if d_ip is not None:
+            kodi_name = json_functions.jsonrpc(_method, _params, None, d_ip, d_port, d_user, d_pass)['System.FriendlyName']
+        else:
+            kodi_name = json_functions.jsonrpc(_method, _params)['System.FriendlyName']
+
+        # get the name of the file to be created
+        dest, _ = name_functions.get_dest(title, url)
+        basename = os.path.basename(dest)
+
+        # the size of the file to be created
+        content, size, mb = simple.get_content_size_mb(content)
+
+        if xbmcgui.Dialog().yesno('Remote Downloader', basename, 'Complete file is {0}MB'.format(mb),
+                                  'Download to {0}?'.format(kodi_name), 'Confirm',  'Cancel') == 0:
             method = 'Addons.ExecuteAddon'
-            params['action'] = 'download'
 
-            # info about the downloading Kodi system
-            downloading_ip = params.get('downloading_ip')
-            downloading_port = params.get('downloading_port')
-            downloading_username = params.get('downloading_username')
-            downloading_password = params.get('downloading_password')
-
-            # requesting system == downloading system
-            if not downloading_ip:
-                json_functions.jsonrpc(method, params, 'script.remote_downloader')
-
-            # requesting system != downloading system
+            if d_ip is not None:
+                params = {'action': 'download', 'title': title, 'url': url, 'image': image, 'content': content}
+                json_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
             else:
-                json_functions.jsonrpc(method, params, 'script.remote_downloader',
-                                       downloading_ip, downloading_port, downloading_username, downloading_password)
+                params = {'action': 'download', 'title': title, 'url': url, 'image': image,
+                          'content': content, 'd_ip': d_ip, 'd_user': d_user, 'd_pass': d_pass,
+                          'd_port': d_port, 'r_ip': ip, 'r_port': port, 'r_user': username, 'r_pass': password}
+                json_functions.jsonrpc(method, params, 'script.remote_downloader')
 
         sys.exit()
 
@@ -274,30 +446,63 @@ if __name__ == "__main__":
     #                                                    #
     # ================================================== #
     if action == 'download':
-        # provided parameters
+        """Download the stream
+
+        Downloading system
+
+        Parameters
+        ----------
+        action : str
+            'download'
+        title : str
+            title of the stream
+        url : str
+            URL for the stream
+        image : str
+            image for the stream
+        content : int
+            file size of the download
+        d_ip : str
+            downloading system IP address (if downloading remotely)
+        d_port : str
+            downloading system port (if downloading remotely)
+        d_user : str
+            downloading system username (if downloading remotely)
+        d_pass : str
+            downloading system password (if downloading remotely)
+        r_ip : str
+            requesting system IP address (if downloading remotely)
+        r_port : str
+            requesting system port (if downloading remotely)
+        r_user : str
+            requesting system username (if downloading remotely)
+        r_pass : str
+            requesting system password (if downloading remotely)
+
+        """
+        title = name_functions.get_title(params.get('title'))
         url = params.get('url')
-        url0 = params.get('url0')
-        title = params.get('title')
         image = params.get('image')
-        headers = params.get('headers')
-        size = params.get('size')
-        mb = params.get('mb')
         content = params.get('content')
-        basename = params.get('basename')
-        dest = params.get('dest')
-        temp_dest = params.get('temp_dest')
-        resumable = params.get('resumable')
+
+        # info about the downloading Kodi system
+        d_ip = params.get('d_ip')
+        d_port = params.get('d_port')
+        d_user = params.get('d_user')
+        d_pass = params.get('d_pass')
+
+        # info about the requesting Kodi system
+        r_ip = params.get('r_ip')
+        r_port = params.get('r_port')
+        r_user = params.get('r_user')
+        r_pass = params.get('r_pass')
 
         # determine whether the file can be downloaded
-        resp, _, _ = helper_functions.resp_content_resumable(url0, headers, 0, title, url0)
+        headers = simple.get_headers(url)
+        content, size, mb = simple.get_content_size_mb(content)
+        resp, _, resumable = helper_functions.resp_content_resumable(url, headers, size, title)
         if resp is None:
             sys.exit()
-
-        # info about the requesting Kodi
-        requesting_ip = params.get('requesting_ip')
-        requesting_username = params.get('requesting_username')
-        requesting_password = params.get('requesting_password')
-        requesting_port = params.get('requesting_port')
 
         # download-tracking variables
         total = 0
@@ -307,30 +512,10 @@ if __name__ == "__main__":
         resume = 0
         sleep = 0
 
-        # provided parameters
-        local_ip = params.get('local_ip')
-        local_username = params.get('local_username')
-        local_password = params.get('local_password')
-        local_port = params.get('local_port')
-
         # get the destination path
-        dest, temp_dest = name_functions.get_dest(title, url0)
+        dest, temp_dest = name_functions.get_dest(title, url)
         if dest is None:
             sys.exit()
-
-        if os.path.exists(dest):
-            i = 2
-            while True:
-                # add "(i)" to the end of the filename and check if it exists
-                new_dest = dest.split('.')
-                new_dest = '.'.join(new_dest[:-1]) + ' ({0}).'.format(i) + new_dest[-1]
-                if not os.path.exists(new_dest):
-                    dest = new_dest
-                    break
-                else:
-                    i += 1
-
-        xbmc.log('script.remote_downloader: ' + 'Download File Size : {0}MB {1}'.format(mb, dest))
 
         f = xbmcvfs.File(temp_dest, 'w')
 
@@ -350,7 +535,7 @@ if __name__ == "__main__":
                     xbmc.executebuiltin("XBMC.Notification({0},{1},{2})".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000))
 
                 # send a notification to the Kodi that sent the download command
-                if requesting_ip is not None:
+                if r_ip is not None:
                     method = "GUI.ShowNotification"
                     if image:
                         _params = {'title': title + ' - Download Progress - ' + str(percent) + '%',
@@ -359,7 +544,7 @@ if __name__ == "__main__":
                         _params = {'title': title + ' - Download Progress - ' + str(percent) + '%',
                                    'message': dest, 'displaytime': 10000}
                     result = json_functions.jsonrpc(method, params, None,
-                                                    requesting_ip, requesting_port, requesting_username, requesting_password)
+                                                    r_ip, r_port, r_user, r_pass)
 
                 notify += 10
 
@@ -389,8 +574,8 @@ if __name__ == "__main__":
                         # update the library
                         method = "VideoLibrary.Scan"
                         update_downloading_library = json_functions.jsonrpc(method)
-                        if requesting_ip is not None:
-                            update_requesting_library = json_functions.jsonrpc(requesting_ip, requesting_port, requesting_username, requesting_password, method)
+                        if r_ip is not None:
+                            update_requesting_library = json_functions.jsonrpc(r_ip, r_port, r_user, r_pass, method)
 
                         sys.exit()
 
@@ -442,7 +627,7 @@ if __name__ == "__main__":
                     chunks  = []
                     #create new response
                     xbmc.log('script.remote_downloader: ' + 'Download resumed ({0}) {1}'.format(resume, dest))
-                    resp, _, _ = helper_functions.resp_content_resumable(url, headers, total, title, url0)
+                    resp, _, _ = helper_functions.resp_content_resumable(url, headers, total, title)
                 else:
                     #use existing response
                     pass

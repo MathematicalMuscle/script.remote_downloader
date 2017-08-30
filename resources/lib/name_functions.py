@@ -6,11 +6,11 @@ import xbmc
 import xbmcaddon
 import xbmcvfs
 
-import json
 import os
 import re
-import sys
 import urlparse
+
+from . import simple
 
 
 def trans(text):
@@ -29,8 +29,13 @@ def title_substitutions(title):
     return title
 
 
-def get_dest(title, url0, look_for_duplicates=True):
+def get_title(title):
+    return title_substitutions(trans(title))
+
+
+def get_dest(title, url, look_for_duplicates=True):
     transname = title_substitutions(trans(title))
+    url0 = simple.get_url0(url)
 
     name = re.compile('(.+?)\sS(\d*)E\d*$').findall(title)
     levels =['../../../..', '../../..', '../..', '..']

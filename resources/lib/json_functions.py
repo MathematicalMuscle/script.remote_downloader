@@ -4,7 +4,7 @@
 
 
 import xbmc
-
+import xbmcaddon
 
 import base64
 import json
@@ -12,7 +12,10 @@ import urllib
 import urllib2
 
 
-ip = xbmc.getIPAddress()
+# info about this system
+ip = xbmcaddon.Addon('script.remote_downloader').getSetting('local_ip_address')
+if not ip:
+    ip = xbmc.getIPAddress()
 username = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverusername"}, "id":1}'))['result']['value']
 password = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverpassword"}, "id":1}'))['result']['value']
 port = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverport"}, "id":1}'))['result']['value']

@@ -7,11 +7,12 @@ import xbmcgui
 
 import os
 import urllib2
+import urlparse
 
 from . import name_functions
 
 
-def resp_content_resumable(url, headers, size, title, url0):
+def resp_content_resumable(url, headers, size, title=None):
     try:
         if size > 0:
             size = int(size)
@@ -21,23 +22,23 @@ def resp_content_resumable(url, headers, size, title, url0):
         resp = urllib2.urlopen(req, timeout=30)
 
     except:
-        dest, _ = name_functions.get_dest(title, url0, look_for_duplicates=False)
-        xbmcgui.Dialog().ok(title, dest, 'Download failed', 'No response from server')
+        if title is not None:
+            url0 = get_url0(url)
+            dest, _ = name_functions.get_dest(title, url0, look_for_duplicates=False)
+            xbmcgui.Dialog().ok(title, dest, 'Download failed', 'No response from server')
         return None, None, None
 
     try:
         content = int(resp.headers['Content-Length'])
     except:
-        xbmcgui.Dialog().ok(title, name_functions.trans(title), 'Unknown filesize', 'Unable to download')
+        if title is not None:
+            xbmcgui.Dialog().ok(title, name_functions.trans(title), 'Unknown filesize', 'Unable to download')
         return None, None, None
 
     try:
         resumable = 'bytes' in resp.headers['Accept-Ranges'].lower()
     except:
         resumable = False
-
-    if resumable:
-        xbmc.log("Download is resumable")
 
     return resp, content, resumable
 
@@ -56,8 +57,20 @@ def done(title, dest, downloaded):
 
     xbmcgui.Window(10000).setProperty('GEN-DOWNLOADED', text)
 
-    if (not downloaded) or (not playing):
+    if not downloaded or not playing:
         xbmcgui.Dialog().ok(title, text)
         xbmcgui.Window(10000).clearProperty('GEN-DOWNLOADED')
 
     return
+
+
+def get_url0(url):
+    return url.split('|')[0]
+
+
+def get_headers(url):
+    try:
+        headers = dict(urlparse.parse_qsl(url.rsplit('|', 1)[1]))
+    except:
+        headers = dict('')
+    return headers

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.remote_downloader" name="Remote Downloader" version="0.0.24" provider-name="Mathematical Muscle">
+<addon id="script.remote_downloader" name="Remote Downloader" version="0.1.0" provider-name="Mathematical Muscle">
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>
         <import addon="script.common.plugin.cache" version="0.9.1" />
@@ -15,15 +15,15 @@
         <language>en</language>
     </extension>
     <news>
-        v0.0.1 (2016-11-04) - Initial commit
-        v0.0.2 (2016-11-08) - Added icon
-        v0.0.3 (2016-11-09) - Modify 'Last Played' addon (in addition to Exodus); changed icon
-        v0.0.4 (2017-01-18) - Added an option to download each movie into its own folder or not
-        v0.0.5 (2017-02-04) - Updated the modification of the Exodus and Last Played addons
-        v0.0.6 (2017-03-20) - Added the option to update the library after each download finishes
-        v0.0.7 (2017-03-20) - Fixed a typo ('local_movies_folder' --> 'update_library')
-        v0.0.8 (2017-04-03) - Cleaned up code; modify Exodus download settings (if necessary)
-        v0.0.9 (2017-04-04) - Automatically modify Exodus using Kodi Callbacks (if installed)
+        v0.0.1  (2016-11-04) - Initial commit
+        v0.0.2  (2016-11-08) - Added icon
+        v0.0.3  (2016-11-09) - Modify 'Last Played' addon (in addition to Exodus); changed icon
+        v0.0.4  (2017-01-18) - Added an option to download each movie into its own folder or not
+        v0.0.5  (2017-02-04) - Updated the modification of the Exodus and Last Played addons
+        v0.0.6  (2017-03-20) - Added the option to update the library after each download finishes
+        v0.0.7  (2017-03-20) - Fixed a typo ('local_movies_folder' --> 'update_library')
+        v0.0.8  (2017-04-03) - Cleaned up code; modify Exodus download settings (if necessary)
+        v0.0.9  (2017-04-04) - Automatically modify Exodus using Kodi Callbacks (if installed)
         v0.0.10 (2017-04-04) - Fixed a typo
         v0.0.11 (2017-04-04) - String formatting
         v0.0.12 (2017-04-04) - Make sure the remote Kodi is available before trying to download
@@ -39,5 +39,6 @@
         v0.0.22 (2017-08-10) - Include the year in movie filenames
         v0.0.23 (2017-08-21) - Enabled custom regex substitutions in titles
         v0.0.24 (2017-08-29) - Enabled multiple remote Kodi systems and local downloading if none are available
+        v0.1.0  (2017-08-29) - Bug fixes, multiple remote Kodi systems now works
     </news>
 </addon>

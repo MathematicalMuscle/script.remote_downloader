@@ -40,6 +40,10 @@ msgctxt "#32005"
 msgid "Local temp download folder:"
 msgstr ""
 
+msgctxt "#32006"
+msgid "Local IP address (optional):"
+msgstr ""
+
 msgctxt "#32010"
 msgid "Remote Kodi 1"
 msgstr ""
