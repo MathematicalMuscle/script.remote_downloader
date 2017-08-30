@@ -223,9 +223,9 @@ if __name__ == "__main__":
                 d_user = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_username{0}'.format(i+1))
                 d_pass = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_password{0}'.format(i+1))
 
-                if d_ip != '':
-                    params = {'action': 'request_download', 'title': title, 'url': url, 'image': image,
-                              'content': content, 'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
+                if d_ip:
+                    params = {'action': 'request_download', 'title': title, 'url': url, 'image': image, 'content': content,
+                              'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
                               'r_ip': ip, 'r_port': port, 'r_user': username, 'r_pass': password}
 
                     result = json_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
@@ -321,7 +321,7 @@ if __name__ == "__main__":
         # the JSON-RPC method
         method = 'Addons.ExecuteAddon'
 
-        if r_ip is not None:
+        if d_ip:
             params = {'action': 'confirm_download', 'title': title, 'url': url, 'image': image, 'content': content,
                       'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass}
             json_functions.jsonrpc(method, params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
@@ -413,7 +413,7 @@ if __name__ == "__main__":
         # get the name of the downloading Kodi system
         _params = {"labels": ["System.FriendlyName"]}
         _method = "XBMC.GetInfoLabels"
-        if d_ip is not None:
+        if d_ip:
             kodi_name = json_functions.jsonrpc(_method, _params, None, d_ip, d_port, d_user, d_pass)['System.FriendlyName']
         else:
             kodi_name = json_functions.jsonrpc(_method, _params)['System.FriendlyName']
@@ -429,13 +429,13 @@ if __name__ == "__main__":
                                   'Download to {0}?'.format(kodi_name), 'Confirm',  'Cancel') == 0:
             method = 'Addons.ExecuteAddon'
 
-            if d_ip is not None:
-                params = {'action': 'download', 'title': title, 'url': url, 'image': image, 'content': content}
+            if d_ip:
+                params = {'action': 'download', 'title': title, 'url': url, 'image': image, 'content': content,
+                          'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
+                          'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
                 json_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
             else:
-                params = {'action': 'download', 'title': title, 'url': url, 'image': image,
-                          'content': content, 'd_ip': d_ip, 'd_user': d_user, 'd_pass': d_pass,
-                          'd_port': d_port, 'r_ip': ip, 'r_port': port, 'r_user': username, 'r_pass': password}
+                params = {'action': 'download', 'title': title, 'url': url, 'image': image, 'content': content}
                 json_functions.jsonrpc(method, params, 'script.remote_downloader')
 
         sys.exit()
@@ -535,7 +535,7 @@ if __name__ == "__main__":
                     xbmc.executebuiltin("XBMC.Notification({0},{1},{2})".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000))
 
                 # send a notification to the Kodi that sent the download command
-                if r_ip is not None:
+                if r_ip:
                     method = "GUI.ShowNotification"
                     if image:
                         _params = {'title': title + ' - Download Progress - ' + str(percent) + '%',
@@ -573,7 +573,7 @@ if __name__ == "__main__":
                         # update the library
                         method = "VideoLibrary.Scan"
                         update_downloading_library = json_functions.jsonrpc(method)
-                        if r_ip is not None:
+                        if r_ip:
                             update_requesting_library = json_functions.jsonrpc(method, None, None, r_ip, r_port, r_user, r_pass)
 
                         sys.exit()
