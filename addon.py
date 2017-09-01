@@ -291,6 +291,8 @@ if __name__ == "__main__":
             image for the stream
         content : int
             file size of the download
+        basename : str
+            the name of the file to be created
         d_ip : str
             downloading system IP address (if downloading remotely)
         d_port : str
@@ -321,13 +323,17 @@ if __name__ == "__main__":
         # the JSON-RPC method
         method = 'Addons.ExecuteAddon'
 
+        # get the name of the file to be created
+        dest, _ = name_functions.get_dest(title, url)
+        basename = os.path.basename(dest)
+
         if d_ip:
-            params = {'action': 'confirm_download', 'title': title, 'url': url, 'image': image, 'content': content,
+            params = {'action': 'confirm_download', 'title': title, 'url': url, 'image': image, 'content': content, 'basename': basename,
                       'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass}
             json_functions.jsonrpc(method, params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
 
         else:
-            params = {'action': 'confirm_download', 'title': title, 'url': url, 'image': image, 'content': content}
+            params = {'action': 'confirm_download', 'title': title, 'url': url, 'image': image, 'content': content, 'basename': basename}
             json_functions.jsonrpc(method, params, 'script.remote_downloader')
 
         sys.exit()
@@ -354,6 +360,8 @@ if __name__ == "__main__":
             image for the stream
         content : int
             file size of the download
+        basename : str
+            the name of the file to be created
         d_ip : str
             downloading system IP address (if downloading remotely)
         d_port : str
@@ -397,6 +405,7 @@ if __name__ == "__main__":
         url = params.get('url')
         image = params.get('image')
         content = params.get('content')
+        basename = params.get('basename')
 
         # info about the downloading Kodi system
         d_ip = params.get('d_ip')
@@ -417,10 +426,6 @@ if __name__ == "__main__":
             kodi_name = json_functions.jsonrpc(_method, _params, None, d_ip, d_port, d_user, d_pass)['System.FriendlyName']
         else:
             kodi_name = json_functions.jsonrpc(_method, _params)['System.FriendlyName']
-
-        # get the name of the file to be created
-        dest, _ = name_functions.get_dest(title, url)
-        basename = os.path.basename(dest)
 
         # the size of the file to be created
         content, size, mb = simple.get_content_size_mb(content)
@@ -506,6 +511,11 @@ if __name__ == "__main__":
         if resp is None or dest is None:
             sys.exit()
 
+        # the name of the file to be created
+        basename = os.path.basename(dest)
+        basename = basename.split('.')
+        basename = '.'.join(basename[:-1])
+
         # download-tracking variables
         total = 0
         notify = 0
@@ -527,19 +537,17 @@ if __name__ == "__main__":
             if percent >= notify:
                 # show a notification of the download progress
                 if image:
-                    xbmc.executebuiltin("XBMC.Notification({0},{1},{2},{3})".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000, image))
+                    xbmc.executebuiltin("XBMC.Notification({0},{1},{2},{3})".format(str(percent) + '% - ' + basename, dest, 10000, image))
                 else:
-                    xbmc.executebuiltin("XBMC.Notification({0},{1},{2})".format(title + ' - Download Progress - ' + str(percent) + '%', dest, 10000))
+                    xbmc.executebuiltin("XBMC.Notification({0},{1},{2})".format(str(percent) + '% - ' + basename, dest, 10000))
 
                 # send a notification to the Kodi that sent the download command
                 if r_ip:
                     method = "GUI.ShowNotification"
                     if image:
-                        _params = {'title': title + ' - Download Progress - ' + str(percent) + '%',
-                                   'message': dest, 'image': image, 'displaytime': 10000}
+                        _params = {'title': str(percent) + '% - ' + basename, 'message': dest, 'image': image, 'displaytime': 10000}
                     else:
-                        _params = {'title': title + ' - Download Progress - ' + str(percent) + '%',
-                                   'message': dest, 'displaytime': 10000}
+                        _params = {'title': str(percent) + '% - ' + basename, 'message': dest, 'displaytime': 10000}
                     result = json_functions.jsonrpc(method, _params, None, r_ip, r_port, r_user, r_pass)
 
                 notify += 10
