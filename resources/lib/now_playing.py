@@ -70,11 +70,11 @@ def process_now_playing():
             if showtitle == '':
                 sys.exit()
 
-            season = xbmcgui.Dialog().input('Enter season:')
+            season = xbmcgui.Dialog().input('Enter season:', type=xbmcgui.INPUT_NUMERIC)
             if season == '':
                 sys.exit()
 
-            episode = xbmcgui.Dialog().input('Enter episode number:')
+            episode = xbmcgui.Dialog().input('Enter episode number:', type=xbmcgui.INPUT_NUMERIC)
             if episode == '':
                 sys.exit()
 

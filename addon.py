@@ -206,6 +206,11 @@ if __name__ == "__main__":
         if resp is None and content is None:
             sys.exit()
 
+        # if the file is 0 MB, show an error message and stop
+        if content == 0:
+            xbmcgui.Dialog().ok('Remote Downloader', 'Error: video is 0 MB.')
+            sys.exit()
+
         # JSON-RPC arguments
         method = 'Addons.ExecuteAddon'
 
