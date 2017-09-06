@@ -48,6 +48,6 @@
         v0.1.6  (2017-08-30) - Removed debugging code
         v0.1.7  (2017-08-31) - Improved confirmation and notification messages
         v0.1.8  (2017-09-04) - Don't download videos with zero size; input TV season and episode as numbers
-        v0.1.9  (2017-09-06) - Don't download videos < 1 MB
+        v0.1.9  (2017-09-06) - Don't download videos smaller than 1 MB
     </news>
 </addon>
