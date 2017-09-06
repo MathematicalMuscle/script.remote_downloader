@@ -15,12 +15,3 @@ def get_headers(url):
     except:
         headers = dict('')
     return headers
-
-
-def get_content_size_mb(content):
-    size = 1024 * 1024
-    mb = content / size
-    if content < size:
-        size = content
-
-    return content, size, mb

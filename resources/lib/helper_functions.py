@@ -12,7 +12,7 @@ import urlparse
 from . import simple
 
 
-def resp_content_resumable(url, headers, size=0, title=None):
+def resp_bytesize_resumable(url, headers, size=0, title=None):
     url0 = simple.get_url0(url)
     try:
         if size > 0:
@@ -28,7 +28,7 @@ def resp_content_resumable(url, headers, size=0, title=None):
         return None, None, None
 
     try:
-        content = int(resp.headers['Content-Length'])
+        bytesize = int(resp.headers['Content-Length'])
     except:
         if title is not None:
             xbmcgui.Dialog().ok('Remote Downloader', 'Error: unknown filesize')
@@ -39,7 +39,7 @@ def resp_content_resumable(url, headers, size=0, title=None):
     except:
         resumable = False
 
-    return resp, content, resumable
+    return resp, bytesize, resumable
 
 
 def done(title, dest, downloaded):
