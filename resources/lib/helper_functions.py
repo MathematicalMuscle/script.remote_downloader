@@ -9,7 +9,6 @@ import os
 import urllib2
 import urlparse
 
-from . import name_functions
 from . import simple
 
 
@@ -25,16 +24,14 @@ def resp_content_resumable(url, headers, size=0, title=None):
 
     except:
         if title is not None:
-            #url0 = get_url0(url)
-            dest, _ = name_functions.get_dest(title, url0, look_for_duplicates=False)
-            xbmcgui.Dialog().ok(title, dest, 'Download failed', 'No response from server')
+            xbmcgui.Dialog().ok('Remote Downloader', 'Error: no response from server')
         return None, None, None
 
     try:
         content = int(resp.headers['Content-Length'])
     except:
         if title is not None:
-            xbmcgui.Dialog().ok(title, name_functions.trans(title), 'Unknown filesize', 'Unable to download')
+            xbmcgui.Dialog().ok('Remote Downloader', 'Error: unknown filesize')
         return None, None, None
 
     try:

@@ -33,12 +33,11 @@ def get_title(title):
     return title_substitutions(trans(title))
 
 
-def get_dest(title, url, look_for_duplicates=True):
+def get_dest(title, url, look_for_duplicates=True, make_directories=True):
     transname = title_substitutions(trans(title))
     url0 = simple.get_url0(url)
 
     name = re.compile('(.+?)\sS(\d*)E\d*$').findall(title)
-    levels =['../../../..', '../../..', '../..', '..']
 
     if len(name) == 0:
         # movie
@@ -47,17 +46,11 @@ def get_dest(title, url, look_for_duplicates=True):
             return None, None
 
         dest = xbmc.translatePath(dest)
-        for level in levels:
-            try:
-                xbmcvfs.mkdir(os.path.abspath(os.path.join(dest, level)))
-            except:
-                pass
-        xbmcvfs.mkdir(dest)
 
         # put the movie into its own folder?
         if xbmcaddon.Addon('script.remote_downloader').getSetting('local_movies_own_folder') == 'true':
             dest = os.path.join(dest, transname)
-            xbmcvfs.mkdir(dest)
+
     else:
         # TV
         dest = xbmcaddon.Addon('script.remote_downloader').getSetting('local_tv_folder')
@@ -65,17 +58,17 @@ def get_dest(title, url, look_for_duplicates=True):
             return None, None
 
         dest = xbmc.translatePath(dest)
-        for level in levels:
-            try:
-                xbmcvfs.mkdir(os.path.abspath(os.path.join(dest, level)))
-            except:
-                pass
-        xbmcvfs.mkdir(dest)
+
+        # add the show title
         transtvshowtitle = trans(name[0][0])
         dest = os.path.join(dest, transtvshowtitle)
-        xbmcvfs.mkdir(dest)
+
+        # add the season
         dest = os.path.join(dest, 'Season {0:01d}'.format(int(name[0][1])))
-        xbmcvfs.mkdir(dest)
+
+    # make the directory?
+    if make_directories:
+        xbmcvfs.mkdirs(dest)
 
     # add the extension
     ext = os.path.splitext(urlparse.urlparse(url0).path)[1][1:]

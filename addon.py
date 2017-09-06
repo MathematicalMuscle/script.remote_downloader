@@ -208,7 +208,7 @@ if __name__ == "__main__":
 
         # if the file is < 1 MB, show an error message and stop
         if content < 1024 * 1024:
-            xbmcgui.Dialog().ok('Remote Downloader', 'Error: video is 0 MB.')
+            xbmcgui.Dialog().ok('Remote Downloader', 'Error: video is 0 MB')
             sys.exit()
 
         # JSON-RPC arguments
@@ -329,7 +329,7 @@ if __name__ == "__main__":
         method = 'Addons.ExecuteAddon'
 
         # get the name of the file to be created
-        dest, _ = name_functions.get_dest(title, url)
+        dest, _ = name_functions.get_dest(title, url, make_directories=False)
         basename = os.path.basename(dest)
 
         if d_ip:
