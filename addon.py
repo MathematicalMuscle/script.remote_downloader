@@ -206,8 +206,8 @@ if __name__ == "__main__":
         if resp is None and content is None:
             sys.exit()
 
-        # if the file is 0 MB, show an error message and stop
-        if content == 0:
+        # if the file is < 1 MB, show an error message and stop
+        if content < 1024 * 1024:
             xbmcgui.Dialog().ok('Remote Downloader', 'Error: video is 0 MB.')
             sys.exit()
 
@@ -435,7 +435,7 @@ if __name__ == "__main__":
         # the size of the file to be created
         content, size, mb = simple.get_content_size_mb(content)
 
-        if xbmcgui.Dialog().yesno('Remote Downloader', basename, 'Complete file is {0}MB'.format(mb),
+        if xbmcgui.Dialog().yesno('Remote Downloader', basename, 'Complete file is {0} MB'.format(mb),
                                   'Download to {0}?'.format(kodi_name), 'Confirm',  'Cancel') == 0:
             method = 'Addons.ExecuteAddon'
 
