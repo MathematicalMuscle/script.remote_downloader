@@ -13,7 +13,7 @@ def modify(msg_fmt='ok'):
         old = 'try: downloader.download(name, image, sources.sources().sourcesResolve(json.loads(source)[0], True))'
         new = 'try:\n'
         new += '        import urllib\n'
-        new += '        xbmc.executebuiltin("RunScript(script.remote_downloader, {0})".format(urllib.quote_plus(str({\'title\': name, \'image\': image, \'url\': sources.sources().sourcesResolve(json.loads(source)[0], True)}))))'
+        new += '        xbmc.executebuiltin("RunScript(script.remote_downloader, {0})".format(urllib.quote_plus(str({\'action\': \'prepare_download\', \'title\': name, \'image\': image, \'url\': sources.sources().sourcesResolve(json.loads(source)[0], True)}))))'
         if old in text:
             text = text.replace(old, new)
             with open(infile, 'w') as f:

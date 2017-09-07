@@ -15,8 +15,8 @@ def modify(msg_fmt='ok'):
         new += "\t\t\t\t\ttitle = '{0} S{1:02d}E{2:02d}'.format(line['show'], int(line['season']), int(line['episode']))\n"
         new += "\t\t\t\telse:\n"
         new += "\t\t\t\t\ttitle = line['title']\n"
-        new += "\t\t\t\tinfo = {'url': line['video'], 'image': line['thumbnail'], 'title': title}\n"
-        new += "\t\t\t\tcommand.append(('Download', 'RunScript(script.remote_downloader, {0})'.format(urllib.quote_plus(str(info)))))\n"
+        new += "\t\t\t\tparams = {'action': 'prepare_download', 'url': line['video'], 'image': line['thumbnail'], 'title': title}\n"
+        new += "\t\t\t\tcommand.append(('Download', 'RunScript(script.remote_downloader, {0})'.format(urllib.quote_plus(str(params)))))\n"
         new += "\t\t\t\tli.addContextMenuItems(command)"
         if old in text and new not in text:
             # text = text.replace(new, old)

@@ -141,7 +141,6 @@ if __name__ == "__main__":
 
         """
         title, url, image = now_playing.process_now_playing()
-        title = name_functions.get_title(title)
 
         # download the current video
         params = {'action': 'prepare_download', 'title': title, 'url': url, 'image': image}
@@ -200,7 +199,7 @@ if __name__ == "__main__":
             downloading system password (if downloading remotely)
 
         """
-        title = params.get('title')
+        title = name_functions.get_title(params.get('title'))
         url = params.get('url')
         image = params.get('image')
 
