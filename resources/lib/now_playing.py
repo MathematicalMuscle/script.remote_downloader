@@ -8,6 +8,9 @@ import xbmcgui
 import json
 import sys
 
+from . import helper_functions
+from . import simple
+
 
 def get_now_playing():
     """Get info about the currently played file via JSON-RPC.
@@ -32,6 +35,12 @@ def process_now_playing():
 
     url = info['file']
     if url == '':
+        sys.exit()
+
+    # determine whether the file can be downloaded
+    headers = simple.get_headers(url)
+    _, bytesize, _ = helper_functions.resp_bytesize_resumable(url, headers)
+    if bytesize is None:
         sys.exit()
 
     image = info['thumbnail']
@@ -93,4 +102,4 @@ def process_now_playing():
         else:
             sys.exit()
 
-    return title, url, image
+    return title, url, image, bytesize

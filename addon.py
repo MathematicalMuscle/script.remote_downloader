@@ -138,12 +138,14 @@ if __name__ == "__main__":
             URL for the stream
         image : str
             image for the stream
+        bytesize : int
+            file size of the download in bytes
 
         """
-        title, url, image = now_playing.process_now_playing()
+        title, url, image, bytesize = now_playing.process_now_playing()
 
         # download the current video
-        params = {'action': 'prepare_download', 'title': title, 'url': url, 'image': image}
+        params = {'action': 'prepare_download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize}
         method = 'Addons.ExecuteAddon'
         result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
         sys.exit()
@@ -168,6 +170,8 @@ if __name__ == "__main__":
             URL for the stream
         image : str
             image for the stream
+        bytesize : int
+            file size of the download in bytes (if downloading the "now playing" stream)
 
         Returns
         -------
@@ -202,10 +206,11 @@ if __name__ == "__main__":
         title = name_functions.get_title(params.get('title'))
         url = params.get('url')
         image = params.get('image')
+        bytesize = params.get('bytesize')
 
         # if there is no url, exit
         if url is None:
-            xbmcgui.Dialog().ok('Remote Downloader', 'There is no stream.  Exiting now.')
+            xbmcgui.Dialog().ok('Remote Downloader', 'Error: there is no stream')
             sys.exit()
 
         # derived parameters
@@ -213,9 +218,10 @@ if __name__ == "__main__":
         headers = simple.get_headers(url)
 
         # determine whether the file can be downloaded
-        resp, bytesize, resumable = helper_functions.resp_bytesize_resumable(url, headers, 0, title)
-        if resp is None and bytesize is None:
-            sys.exit()
+        if bytesize is None:
+            _, bytesize, _ = helper_functions.resp_bytesize_resumable(url, headers)
+            if bytesize is None:
+                sys.exit()
 
         # if the file is < 1 MB, show an error message and stop
         if bytesize < 1024 * 1024:
@@ -521,7 +527,7 @@ if __name__ == "__main__":
         # determine whether the file can be downloaded
         headers = simple.get_headers(url)
         mbsize = bytesize / (1024 * 1024)
-        resp, _, resumable = helper_functions.resp_bytesize_resumable(url, headers, 0, title)
+        resp, _, resumable = helper_functions.resp_bytesize_resumable(url, headers)
         dest, temp_dest = name_functions.get_dest(title, url)
 
         if resp is None or dest is None:
@@ -647,7 +653,7 @@ if __name__ == "__main__":
                     chunks  = []
                     #create new response
                     xbmc.log('script.remote_downloader: ' + 'Download resumed ({0}) {1}'.format(resume, dest))
-                    resp, _, _ = helper_functions.resp_bytesize_resumable(url, headers, total, title)
+                    resp, _, _ = helper_functions.resp_bytesize_resumable(url, headers, total)
                 else:
                     #use existing response
                     pass

@@ -12,7 +12,7 @@ import urlparse
 from . import simple
 
 
-def resp_bytesize_resumable(url, headers, size=0, title=None):
+def resp_bytesize_resumable(url, headers, size=0):
     url0 = simple.get_url0(url)
     try:
         if size > 0:
@@ -23,15 +23,13 @@ def resp_bytesize_resumable(url, headers, size=0, title=None):
         resp = urllib2.urlopen(req, timeout=30)
 
     except:
-        if title is not None:
-            xbmcgui.Dialog().ok('Remote Downloader', 'Error: no response from server')
+        xbmcgui.Dialog().ok('Remote Downloader', 'Error: no response from server')
         return None, None, None
 
     try:
         bytesize = int(resp.headers['Content-Length'])
     except:
-        if title is not None:
-            xbmcgui.Dialog().ok('Remote Downloader', 'Error: unknown filesize')
+        xbmcgui.Dialog().ok('Remote Downloader', 'Error: unknown filesize')
         return None, None, None
 
     try:
@@ -61,15 +59,3 @@ def done(title, dest, downloaded):
         xbmcgui.Window(10000).clearProperty('GEN-DOWNLOADED')
 
     return
-
-
-def get_url0(url):
-    return url.split('|')[0]
-
-
-def get_headers(url):
-    try:
-        headers = dict(urlparse.parse_qsl(url.rsplit('|', 1)[1]))
-    except:
-        headers = dict('')
-    return headers
