@@ -43,7 +43,7 @@ def get_dest(title, url, look_for_duplicates=True, make_directories=True):
         # movie
         dest = xbmcaddon.Addon('script.remote_downloader').getSetting('local_movies_folder')
         if dest == "":
-            return None, None
+            return 1, None
 
         dest = xbmc.translatePath(dest)
 
@@ -55,7 +55,7 @@ def get_dest(title, url, look_for_duplicates=True, make_directories=True):
         # TV
         dest = xbmcaddon.Addon('script.remote_downloader').getSetting('local_tv_folder')
         if dest == "":
-            return None, None
+            return 2, None
 
         dest = xbmc.translatePath(dest)
 

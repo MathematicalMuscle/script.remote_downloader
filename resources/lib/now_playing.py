@@ -3,6 +3,7 @@
 """
 
 import xbmc
+import xbmcaddon
 import xbmcgui
 
 import json
@@ -27,6 +28,16 @@ def get_now_playing():
 
 
 def process_now_playing():
+    # pre-check: make sure a download path has been configured
+    download_local = xbmcaddon.Addon('script.remote_downloader').getSetting('download_local')
+    local_movies_folder = xbmcaddon.Addon('script.remote_downloader').getSetting('local_movies_folder')
+    local_tv_folder = xbmcaddon.Addon('script.remote_downloader').getSetting('local_tv_folder')
+
+    if download_local == 'Yes':
+        if not local_movies_folder and not local_tv_folder:
+            xbmcgui.Dialog().ok('Remote Downloader', 'Error: download paths not configured in Remote Downloader settings')
+            sys.exit()
+
     try:
         info = get_now_playing()
     except:
@@ -35,6 +46,7 @@ def process_now_playing():
 
     url = info['file']
     if url == '':
+        xbmcgui.Dialog().ok('Remote Downloader', 'Error: cannot get stream URL')
         sys.exit()
 
     # determine whether the file can be downloaded
@@ -47,6 +59,11 @@ def process_now_playing():
 
     # Movie
     if info['type'] == 'movie' and info['label']:
+        # if downloading locally, make sure the movies download path has been configured
+        if download_local == 'Yes' and not local_movies_folder:
+            xbmcgui.Dialog().ok('Remote Downloader', 'Error: movies download folder not setup in Remote Downloader settings')
+            sys.exit()
+
         title = info['label']
         if title[-1] != ')' or title[-5:-3] not in ['19', '20']:
             year = xbmc.getInfoLabel('VideoPlayer.Year')
@@ -55,6 +72,11 @@ def process_now_playing():
 
     # TV
     elif info['type'] == 'episode' and info['showtitle'] and info['season'] != '-1' and info['episode'] != '-1':
+        # if downloading locally, make sure the TV download path has been configured
+        if download_local == 'Yes' and not local_tv_folder:
+            xbmcgui.Dialog().ok('Remote Downloader', 'Error: TV download folder not setup in Remote Downloader settings')
+            sys.exit()
+
         title = '{0} S{1:02d}E{2:02d}'.format(info['showtitle'], int(info['season']), int(info['episode']))
 
     # ask the user
@@ -63,6 +85,11 @@ def process_now_playing():
 
         # Movie
         if movie_or_tv == 0:
+            # if downloading locally, make sure the movies download path has been configured
+            if download_local == 'Yes' and not local_movies_folder:
+                xbmcgui.Dialog().ok('Remote Downloader', 'Error: movies download folder not setup in Remote Downloader settings')
+                sys.exit()
+
             if len(info['label']) < 25 or ' ' in info['label']:
                 title = xbmcgui.Dialog().input('Enter movie name:', info['label'])
             else:
@@ -72,6 +99,11 @@ def process_now_playing():
 
         # TV
         elif movie_or_tv == 1:
+            # if downloading locally, make sure the TV download path has been configured
+            if download_local == 'Yes' and not local_tv_folder:
+                xbmcgui.Dialog().ok('Remote Downloader', 'Error: TV download folder not setup in Remote Downloader settings')
+                sys.exit()
+                
             if len(info['showtitle']) < 25 or ' ' in info['showtitle']:
                 showtitle = xbmcgui.Dialog().input('Enter show title:', info['showtitle'])
             else:

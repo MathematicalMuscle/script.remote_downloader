@@ -259,7 +259,9 @@ if __name__ == "__main__":
                 params = {'action': 'request_download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize}
 
                 result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
+                sys.exit()
 
+        xbmcgui.Dialog().ok('Remote Downloader', 'Error: no Kodi system available for downloading')
         sys.exit()
 
     # ================================================== #
@@ -347,7 +349,12 @@ if __name__ == "__main__":
 
         # get the name of the file to be created
         dest, _ = name_functions.get_dest(title, url, make_directories=False)
-        basename = os.path.basename(dest)
+        if isinstance(dest, str):
+            # `dest` is a string --> get the basename
+            basename = os.path.basename(dest)
+        else:
+            # `dest` is an integer --> it is an error code
+            basename = dest
 
         if d_ip:
             params = {'action': 'confirm_download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize, 'basename': basename,
@@ -440,6 +447,14 @@ if __name__ == "__main__":
         r_port = port
         r_user = username
         r_pass = password
+
+        # make sure the download paths are configured correctly
+        if basename == 1:
+            xbmcgui.Dialog().ok('Remote Downloader', 'Error: movies download folder not setup in Remote Downloader settings')
+            sys.exit()
+        if basename == 2:
+            xbmcgui.Dialog().ok('Remote Downloader', 'Error: TV download folder not setup in Remote Downloader settings')
+            sys.exit()
 
         # get the name of the downloading Kodi system
         _params = {"labels": ["System.FriendlyName"]}
