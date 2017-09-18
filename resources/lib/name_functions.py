@@ -33,6 +33,10 @@ def get_title(title):
     return title_substitutions(trans(title))
 
 
+def remove_extension(f):
+    return '.'.join(os.path.basename(f).split('.')[:-1])
+
+
 def get_dest(title, url, look_for_duplicates=True, make_directories=True):
     transname = title_substitutions(trans(title))
     url0 = simple.get_url0(url)
@@ -86,19 +90,25 @@ def get_dest(title, url, look_for_duplicates=True, make_directories=True):
     dest = os.path.join(dest, transname + '.' + ext)
 
     if look_for_duplicates:
-        if os.path.exists(dest) or os.path.exists(temp_dest):
-            i = 2
-            while True:
-                # add "(i)" to the end of the filename and check if it exists
-                new_dest = dest.split('.')
-                new_dest = '.'.join(new_dest[:-1]) + ' ({0}).'.format(i) + new_dest[-1]
-                new_temp_dest = temp_dest.split('.')
-                new_temp_dest = '.'.join(new_temp_dest[:-1]) + ' ({0}).'.format(i) + new_temp_dest[-1]
-                if not os.path.exists(new_dest) and not os.path.exists(new_temp_dest):
-                    dest = new_dest
-                    temp_dest = new_temp_dest
-                    break
-                else:
-                    i += 1
+        if os.path.exists(os.path.dirname(dest)):
+            # get lists of the files without extensions in the `dest` and `temp_dest` directories
+            dest_dir = [remove_extension(f) for f in os.listdir(os.path.dirname(dest)) if os.path.isfile(os.path.join(os.path.dirname(dest), f))]
+            temp_dest_dir = [remove_extension(f) for f in os.listdir(os.path.dirname(temp_dest)) if os.path.isfile(os.path.join(os.path.dirname(temp_dest), f))]
+
+            if remove_extension(dest) in dest_dir or remove_extension(temp_dest) in temp_dest_dir:
+                i = 2
+                while True:
+                    # add "(i)" to the end of the filename and check if it exists
+                    new_dest = dest.split('.')
+                    new_dest = '.'.join(new_dest[:-1]) + ' ({0}).'.format(i) + new_dest[-1]
+                    new_temp_dest = temp_dest.split('.')
+                    new_temp_dest = '.'.join(new_temp_dest[:-1]) + ' ({0}).'.format(i) + new_temp_dest[-1]
+
+                    if remove_extension(new_dest) not in dest_dir and remove_extension(new_temp_dest) not in temp_dest_dir:
+                        dest = new_dest
+                        temp_dest = new_temp_dest
+                        break
+                    else:
+                        i += 1
 
     return dest, temp_dest
