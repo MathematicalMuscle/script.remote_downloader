@@ -17,10 +17,10 @@ def jsonrpc(method, params=None, addonid=None, ip=None, port=None, username=None
     payload = {'jsonrpc': '2.0', 'method': method, 'id': '1'}
 
     if params is not None:
-        if addonid == 'script.remote_downloader':
-            payload["params"] = {"addonid": "script.remote_downloader", "params": {"streaminfo": "{0}".format(urllib.quote_plus(str(params)))}}
+        if addonid is not None:
+            payload['params'] = {'addonid': addonid, 'params': urllib.quote_plus(str(params))}
         else:
-            payload["params"] = params
+            payload['params'] = params
 
     # format the data
     data = json.dumps(payload)

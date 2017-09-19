@@ -91,7 +91,7 @@ if __name__ == "__main__":
         sys.exit()
 
     # get the `params`
-    params = json_functions.from_jsonrpc(sys.argv[1])
+    params = json_functions.from_jsonrpc(', '.join(sys.argv[1:]))
     action = params.get('action')
 
     # ================================================== #
