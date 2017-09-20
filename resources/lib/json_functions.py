@@ -66,4 +66,8 @@ def from_jsonrpc(parameters):
     """Extract a dictionary of the parameters sent via a JSON-RPC command
 
     """
-    return eval(urllib.unquote_plus(parameters).replace('streaminfo=', ''))
+    params = eval(urllib.unquote_plus(parameters).replace('streaminfo=', ''))
+    if 'url' in params:
+        if isinstance(params['url'], str):
+            params['url'] = params['url'].replace(' ', '')
+    return params
