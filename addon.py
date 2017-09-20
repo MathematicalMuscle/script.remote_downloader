@@ -62,14 +62,15 @@ if __name__ == "__main__":
 
     Values for `action`:
 
-    * `None` -- `modify_addons()`
-    * `'modify_addons_silent'` -- `modify_addons(msg_fmt='notification')`
-    * `'download_now_playing'` -- the requesting system will get info about the current stream
-    * `'prepare_download'` -- the requesting system sends the inputs (`title`, `image`, `url`) to the downloading
+    * (no parameters provided)) -- Modify addons and exit
+    * `'modify_addons_silent'` -- Modify addons silently and exit
+    * `'update_addons'` -- Update addons and exit
+    * `'download_now_playing'` -- Get info for the current video and proceed to download it
+    * `'prepare_download'` -- Prepare to download a stream
       system, which processes them and sends a confirmation message to the requesting system
-    * `'confirm_download'` -- the downloading system sends a message to the requesting system, which replies with a
-      message indicating whether or not to download the file
-    * `'download'` -- download the stream on the downloading system
+    * `'request_download'` -- Send a message to the requesting system to confirm or cancel the download
+    * `'confirm_download'` -- Send a message telling the downloading system to download the stream
+    * `'download'` -- Download the stream
 
     """
     # if a "title_regex_substitutions.txt" file doesn't exist, create it
@@ -96,18 +97,6 @@ if __name__ == "__main__":
 
     # ================================================== #
     #                                                    #
-    #                  0.1 Update addons                 #
-    #                                                    #
-    # ================================================== #
-    if action == 'update_addons':
-        """Update addons and exit
-
-        """
-        xbmc.executebuiltin('UpdateAddonRepos')
-        sys.exit()
-
-    # ================================================== #
-    #                                                    #
     #             1. Modify addons silently              #
     #                                                    #
     # ================================================== #
@@ -120,11 +109,23 @@ if __name__ == "__main__":
 
     # ================================================== #
     #                                                    #
+    #                  1.1 Update addons                 #
+    #                                                    #
+    # ================================================== #
+    if action == 'update_addons':
+        """Update addons and exit
+
+        """
+        xbmc.executebuiltin('UpdateAddonRepos')
+        sys.exit()
+
+    # ================================================== #
+    #                                                    #
     #              2. Download now playing               #
     #                                                    #
     # ================================================== #
     if action == 'download_now_playing':
-        """Get info for the current video and download it
+        """Get info for the current video and proceed to download it
 
         Requesting system
 
