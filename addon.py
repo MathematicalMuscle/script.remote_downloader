@@ -67,7 +67,6 @@ if __name__ == "__main__":
     * `'update_addons'` -- Update addons and exit
     * `'download_now_playing'` -- Get info for the current video and proceed to download it
     * `'prepare_download'` -- Prepare to download a stream
-      system, which processes them and sends a confirmation message to the requesting system
     * `'request_download'` -- Send a message to the requesting system to confirm or cancel the download
     * `'confirm_download'` -- Send a message telling the downloading system to download the stream
     * `'download'` -- Download the stream
