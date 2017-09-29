@@ -45,6 +45,9 @@ from resources.lib.modify_addons import modify_addons
 
 # info about this system
 ip = xbmcaddon.Addon('script.remote_downloader').getSetting('local_ip_address')
+if ip == "0.0.0.0":
+    xbmcaddon.Addon('script.remote_downloader').setSetting('local_ip_address', '')
+    ip = ''
 if not ip:
     ip = xbmc.getIPAddress()
 port = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverport"}}'))['result']['value']
