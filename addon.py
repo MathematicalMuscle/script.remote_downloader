@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     # ================================================== #
     #                                                    #
-    #                  0. Modify addons                  #
+    #                  a) Modify addons                  #
     #                                                    #
     # ================================================== #
     if len(sys.argv) == 1:
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     # ================================================== #
     #                                                    #
-    #             1. Modify addons silently              #
+    #             b) Modify addons silently              #
     #                                                    #
     # ================================================== #
     if action == 'modify_addons_silent':
@@ -111,7 +111,7 @@ if __name__ == "__main__":
 
     # ================================================== #
     #                                                    #
-    #                  1.1 Update addons                 #
+    #                  c) Update addons                  #
     #                                                    #
     # ================================================== #
     if action == 'update_addons':
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     # ================================================== #
     #                                                    #
-    #              2. Download now playing               #
+    #              1. Download now playing               #
     #                                                    #
     # ================================================== #
     if action == 'download_now_playing':
@@ -155,7 +155,7 @@ if __name__ == "__main__":
 
     # ================================================== #
     #                                                    #
-    #                3. Prepare download                 #
+    #                2. Prepare download                 #
     #                                                    #
     # ================================================== #
     if action == 'prepare_download':
@@ -269,7 +269,7 @@ if __name__ == "__main__":
 
     # ================================================== #
     #                                                    #
-    #                 4. Download request                #
+    #                 3. Download request                #
     #                                                    #
     # ================================================== #
     if action == 'request_download':
@@ -372,7 +372,7 @@ if __name__ == "__main__":
 
     # ================================================== #
     #                                                    #
-    #              5. Download confirmation              #
+    #              4. Download confirmation              #
     #                                                    #
     # ================================================== #
     if action == 'confirm_download':
@@ -487,7 +487,7 @@ if __name__ == "__main__":
 
     # ================================================== #
     #                                                    #
-    #                      6. Download                   #
+    #                      5. Download                   #
     #                                                    #
     # ================================================== #
     if action == 'download':
@@ -577,18 +577,16 @@ if __name__ == "__main__":
             if percent >= notify:
                 # show a notification of the download progress
                 if image:
-                    xbmc.executebuiltin("XBMC.Notification({0},{1},{2},{3})".format(str(percent) + '% - ' + basename, dest, 10000, image))
+                    msg_params = {'title': str(percent) + '% - ' + basename, 'message': dest, 'displaytime': 10000, 'image': image}
+                    xbmc.executebuiltin("XBMC.Notification({title},{message},{displaytime},{image})".format(**msg_params))
                 else:
-                    xbmc.executebuiltin("XBMC.Notification({0},{1},{2})".format(str(percent) + '% - ' + basename, dest, 10000))
+                    msg_params = {'title': str(percent) + '% - ' + basename, 'message': dest, 'displaytime': 10000}
+                    xbmc.executebuiltin("XBMC.Notification({title},{message},{displaytime})".format(**msg_params))
 
                 # send a notification to the Kodi that sent the download command
                 if r_ip:
                     method = "GUI.ShowNotification"
-                    if image:
-                        _params = {'title': str(percent) + '% - ' + basename, 'message': dest, 'image': image, 'displaytime': 10000}
-                    else:
-                        _params = {'title': str(percent) + '% - ' + basename, 'message': dest, 'displaytime': 10000}
-                    result = json_functions.jsonrpc(method, _params, None, r_ip, r_port, r_user, r_pass)
+                    result = json_functions.jsonrpc(method, msg_params, None, r_ip, r_port, r_user, r_pass)
 
                 notify += 10
 

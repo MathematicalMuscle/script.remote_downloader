@@ -5,8 +5,12 @@ import xbmcvfs
 
 
 def create_callbacks(msg_fmt='ok'):
+    # check if Kodi Callbacks is installed and enabled
+    enabled_addons = eval(xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Addons.GetAddons", "params": {"enabled": true}, "id": 1}'))['result']
+    enabled_addons = [x['addonid'] for x in enabled_addons['addons']]
+
     # set Kodi Callbacks settings
-    if xbmcvfs.exists(xbmc.translatePath('special://home/addons/script.service.kodi.callbacks/')) and msg_fmt == 'ok':
+    if 'script.service.kodi.callbacks' in enabled_addons and msg_fmt == 'ok':
         if xbmcgui.Dialog().yesno('Remote Downloader', "Create 'Kodi Callbacks' Task and Event?"):
             # task number
             task = 1
