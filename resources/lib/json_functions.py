@@ -12,7 +12,7 @@ import urllib
 import urllib2
 
 
-def jsonrpc(method, params=None, addonid=None, ip=None, port=None, username=None, password=None):
+def jsonrpc(method, params=None, addonid=None, ip=None, port=None, username=None, password=None, timeout=15):
     # build out the data to be sent
     payload = {'jsonrpc': '2.0', 'method': method, 'id': '1'}
 
@@ -42,7 +42,7 @@ def jsonrpc(method, params=None, addonid=None, ip=None, port=None, username=None
 
         # send the command
         try:
-            response = urllib2.urlopen(req)
+            response = urllib2.urlopen(req, timeout=15)
             response = response.read()
             response = json.loads(response)
 

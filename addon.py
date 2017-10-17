@@ -255,6 +255,8 @@ if __name__ == "__main__":
 
                     result = json_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
                     if result == 'OK':
+                        if json_functions.jsonrpc(method='JSONRPC.Ping', ip=ip, port=port, timeout=5) != 'pong':
+                            xbmcgui.Dialog().ok('Remote Downloader', "Error: please specify the correct IP address for this system")
                         sys.exit()
 
             # no remote Kodi systems available ==> download it locally?

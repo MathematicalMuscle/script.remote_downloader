@@ -60,5 +60,6 @@
         v0.1.18 (2017-09-20) - Fixed handling of URLs from JSON-RPC via HTTP
         v0.1.19 (2017-09-29) - Local IP address '0.0.0.0' gets reset to empty
         v0.1.20 (2017-10-08) - Cleaned up some code
+        v0.1.21 (2017-10-16) - Show an error message if the requesting system's IP address is incorrect
     </news>
 </addon>
