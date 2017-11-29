@@ -83,25 +83,94 @@ if __name__ == "__main__":
 
     # ================================================== #
     #                                                    #
-    #                  a) Modify addons                  #
+    #                        Menu                        #
     #                                                    #
     # ================================================== #
     if len(sys.argv) == 1:
-        """Modify addons and exit
-
+        """Display a menu
+        
         """
-        modify_addons()
-        sys.exit()
+        if xbmc.Player().isPlayingVideo():
+            opts = ['Download current video']
+        else:
+            opts = []
+            
+        opts += ['Modify addons',
+                 'Clean remote video library',
+                 'Update remote video library',
+                 'Update remote addons',
+                 'Restart remote UPnP server']
 
+        len_opts = len(opts)
+                 
+        select = xbmcgui.Dialog().select('Remote Downloader', opts, 0)
+        if select >= 0:
+            if len_opts == 6 and select == 0:
+                # download the current video
+                params = {'action': 'download_now_playing'}
+                method = 'Addons.ExecuteAddon'
+                result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
+                sys.exit()
+            
+            elif select == len_opts - 5:
+                modify_addons()
+                sys.exit()
+                
+            else:
+                # get info about the remote Kodi
+                d_ip = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_ip_address1')
+                d_port = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_port1')
+                d_user = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_username1')
+                d_pass = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_password1')
+                
+                if not d_ip:
+                    sys.exit()
+                    
+                if select == len_opts - 4:
+                    # clean the remote video library
+                    result = json_functions.jsonrpc(method='VideoLibrary.Clean', ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
+                    sys.exit()
+                
+                elif select == len_opts - 3:
+                    # scan the remote video library
+                    result = json_functions.jsonrpc(method='VideoLibrary.Scan', ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
+                    sys.exit()
+                
+                elif select == len_opts - 2:
+                    # update addons on the remote system
+                    method = 'Addons.ExecuteAddon'
+                    params = {'action': 'update_addons'}
+                    result = json_functions.jsonrpc(method, params, 'script.remote_downloader', ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
+                    sys.exit()
+                
+                elif select == len_opts - 1:
+                    # restart the remote UPnP server
+                    method = 'Settings.SetSettingValue'
+                    params = {'setting': 'services.upnpserver', 'value':False}
+                    result = json_functions.jsonrpc(method, params, ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
+                    params = {'setting': 'services.upnpserver', 'value':True}
+                    result = json_functions.jsonrpc(method, params, ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
+                    sys.exit()
+        
+        else:
+            sys.exit()
+        
     # get the `params`
     params = json_functions.from_jsonrpc(', '.join(sys.argv[1:]))
     action = params.get('action')
 
     # ================================================== #
     #                                                    #
-    #             b) Modify addons silently              #
+    #                 0. Simple actions                  #
     #                                                    #
     # ================================================== #
+    if action == 'modify_addons':
+        """Modify addons and exit
+        
+        """
+        modify_addons()
+        sys.exit()
+        
     if action == 'modify_addons_silent':
         """Modify addons silently and exit
 
@@ -109,16 +178,25 @@ if __name__ == "__main__":
         modify_addons(msg_fmt='notification')
         sys.exit()
 
-    # ================================================== #
-    #                                                    #
-    #                  c) Update addons                  #
-    #                                                    #
-    # ================================================== #
     if action == 'update_addons':
         """Update addons and exit
 
         """
         xbmc.executebuiltin('UpdateAddonRepos')
+        sys.exit()
+
+    if action == 'library_clean':
+        """Clean the video library and exit
+
+        """
+        json_functions.jsonrpc('VideoLibrary.Clean')
+        sys.exit()
+
+    if action == 'library_scan':
+        """Scan the video library and exit
+
+        """
+        json_functions.jsonrpc('VideoLibrary.Scan')
         sys.exit()
 
     # ================================================== #
@@ -217,7 +295,6 @@ if __name__ == "__main__":
             sys.exit()
 
         # derived parameters
-        url0 = simple.get_url0(url)
         headers = simple.get_headers(url)
 
         # determine whether the file can be downloaded
@@ -255,7 +332,7 @@ if __name__ == "__main__":
 
                     result = json_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
                     if result == 'OK':
-                        if json_functions.jsonrpc(method='JSONRPC.Ping', ip=ip, port=port, timeout=5) != 'pong':
+                        if json_functions.jsonrpc(method='JSONRPC.Ping', ip=ip, port=port, username=username, password=password, timeout=5) != 'pong':
                             xbmcgui.Dialog().ok('Remote Downloader', "Error: please specify the correct IP address for this system")
                         sys.exit()
 

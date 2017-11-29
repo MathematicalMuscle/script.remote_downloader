@@ -39,7 +39,6 @@ def remove_extension(f):
 
 def get_dest(title, url, look_for_duplicates=True, make_directories=True):
     transname = title_substitutions(trans(title))
-    url0 = simple.get_url0(url)
 
     name = re.compile('(.+?)\sS(\d*)E\d*$').findall(title)
 
@@ -75,6 +74,7 @@ def get_dest(title, url, look_for_duplicates=True, make_directories=True):
         xbmcvfs.mkdirs(dest)
 
     # add the extension
+    url0 = simple.get_url0(url)
     ext = os.path.splitext(urlparse.urlparse(url0).path)[1][1:]
     if ext not in ['mp4', 'mkv', 'flv', 'avi', 'mpg']:
         ext = 'mp4'

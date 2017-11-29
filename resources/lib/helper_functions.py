@@ -13,12 +13,12 @@ from . import simple
 
 
 def resp_bytesize_resumable(url, headers, size=0):
-    url0 = simple.get_url0(url)
     try:
         if size > 0:
             size = int(size)
             headers['Range'] = 'bytes={0}-'.format(size)
 
+        url0 = simple.get_url0(url)
         req = urllib2.Request(url0, headers=headers)
         resp = urllib2.urlopen(req, timeout=30)
 
