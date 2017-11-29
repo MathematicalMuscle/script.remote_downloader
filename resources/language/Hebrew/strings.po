@@ -1,0 +1,82 @@
+# Kodi Media Center language file
+# Addon Name: Remote Downloader
+# Addon id: script.remote_downloader
+# Addon Provider: Mathematical Muscle
+msgid ""
+msgstr ""
+"Project-Id-Version: Kodi Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2017-10-19 14:09+0300\n"
+"Last-Translator: A. Dambledore\n"
+"Language-Team: Eng2Heb\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: he_IL\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+
+msgctxt "#32000"
+msgid "This Kodi"
+msgstr "הקודי הזה"
+
+msgctxt "#32001"
+msgid "Download to this device?"
+msgstr "להוריד למכשיר הזה?"
+
+msgctxt "#32002"
+msgid "Local movies download folder:"
+msgstr "תיקייה מקומית להורדת סרטים:"
+
+msgctxt "#32003"
+msgid "Download each movie into its own folder?"
+msgstr "להוריד כל סרט לתוך תיקייה משלו?"
+
+msgctxt "#32004"
+msgid "Local TV download folder:"
+msgstr "תיקיית הורדה מקומית לטלוויזיה:"
+
+msgctxt "#32005"
+msgid "Local temp download folder:"
+msgstr "תיקיית הורדה מקומית לקבצים זמניים:"
+
+msgctxt "#32006"
+msgid "Local IP address (optional):"
+msgstr "כתובת ה-IP מקומית (אופציה):"
+
+msgctxt "#32010"
+msgid "Remote Kodi 1"
+msgstr "קודי מרוחק: 1"
+
+msgctxt "#32011"
+msgid "Remote IP address:"
+msgstr "כתובת ה-IP מרוחקת:"
+
+msgctxt "#32012"
+msgid "Remote username:"
+msgstr "שם משתמש מרוחק:"
+
+msgctxt "#32013"
+msgid "Remote password:"
+msgstr "סיסמה מרוחקת:"
+
+msgctxt "#32014"
+msgid "Remote port:"
+msgstr "פורט מרוחק:"
+
+msgctxt "#32020"
+msgid "Remote Kodi 2"
+msgstr "קודי מרוחק: 2"
+
+msgctxt "#32030"
+msgid "Remote Kodi 3"
+msgstr "קודי מרוחק: 3"
+
+msgctxt "#32040"
+msgid "Remote Kodi 4"
+msgstr "קודי מרוחק: 4"
+
+msgctxt "#32050"
+msgid "Remote Kodi 5"
+msgstr "קודי מרוחק: 5"
