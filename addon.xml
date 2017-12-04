@@ -62,5 +62,6 @@
         v0.1.20 (2017-10-08) - Cleaned up some code
         v0.1.21 (2017-10-16) - Show an error message if the requesting system's IP address is incorrect
         v0.1.22 (2017-11-28) - Introduced a menu when running the addon as a script
+        v0.1.23 (2017-12-04) - Created 'menu' module and 'restart_upnp' action
     </news>
 </addon>
