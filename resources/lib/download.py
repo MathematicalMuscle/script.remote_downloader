@@ -50,14 +50,15 @@ class Download(object):
         self.basename = '.'.join(basename[:-1])
         
         # the file where progress will be tracked
-        self.progress_file = xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/downloads/{0}.txt'.format(self.basename))
-        i = 0
-        while xbmcvfs.exists(self.progress_file):
-            i += 1
-            self.progress_file = xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/downloads/{0} ({1}).txt'.format(self.basename, i))
-            
-        if not xbmcvfs.exists(os.path.dirname(self.progress_file)):
-            xbmcvfs.mkdirs(os.path.dirname(self.progress_file))
+        if self.track:
+            self.progress_file = xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/downloads/{0}.txt'.format(self.basename))
+            i = 0
+            while xbmcvfs.exists(self.progress_file):
+                i += 1
+                self.progress_file = xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/downloads/{0} ({1}).txt'.format(self.basename, i))
+                
+            if not xbmcvfs.exists(os.path.dirname(self.progress_file)):
+                xbmcvfs.mkdirs(os.path.dirname(self.progress_file))
 
         # download-tracking variables
         total = 0

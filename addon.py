@@ -593,7 +593,7 @@ if __name__ == "__main__":
         r_pass = params.get('r_pass')
         
         # track the download progress?
-        track = xbmcaddon.Addon('script.remote_downloader').getSetting('track_downloads') == 'true'
+        track = params.get('track')
             
         d = download.Download(title, url, image, bytesize, r_ip, r_port, r_user, r_pass, track)
         d.download()
