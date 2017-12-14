@@ -166,12 +166,12 @@ class Download(object):
                     #use existing response
                     pass
                 
-    def track_progress(self, percent):
+    def track_progress(self, percent, finish_time=-1.):
         """Track the download progress
         
         """
         with open(self.progress_file, 'w') as f:
-            f.write('{0}\n{1}\n[COLOR forestgreen]{2:3d}%[/COLOR]  {3}'.format('script.remote_downloader', self.start_time, int(percent), self.basename))
+            f.write('{0}\n{1}\n{2}\n[COLOR forestgreen]{3:3d}%[/COLOR]  {4}'.format('script.remote_downloader', self.start_time, finish_time, int(percent), self.basename))
         
     def notification(self, percent):
         """Show a notification of the download progress
@@ -193,6 +193,7 @@ class Download(object):
         """Show a success message
         
         """
+        self.track_progress(100, time.time())
         playing = xbmc.Player().isPlaying()
         text = xbmcgui.Window(10000).getProperty('GEN-DOWNLOADED')
 
@@ -203,9 +204,14 @@ class Download(object):
             text += '%s : %s' % (self.basename, '[COLOR forestgreen]Download succeeded[/COLOR]')
         else:
             text += '%s : %s' % (self.basename, '[COLOR red]Download failed[/COLOR]')
+            self.delete_tracker()
 
         xbmcgui.Window(10000).setProperty('GEN-DOWNLOADED', text)
 
         if not success or not playing:
             xbmcgui.Dialog().ok(self.title, text)
             xbmcgui.Window(10000).clearProperty('GEN-DOWNLOADED')
+            
+    def delete_tracker(self):
+        if self.progress_file is not None and xbmcvfs.exists(self.progress_file):
+            xbmcvfs.delete(self.progress_file)

@@ -30,9 +30,11 @@ def get_local_downloads(r_ip, r_port, r_user, r_pass):
         with open(txt, 'r') as f:
             lines = f.readlines()
         
-        if len(lines) == 3 and lines[0] == 'script.remote_downloader\n':
-            start_time, progress = lines[1:]
-            if time.time() - float(start_time.strip()) > uptime:
+        if len(lines) == 4 and lines[0] == 'script.remote_downloader\n':
+            start_time, finish_time, progress = lines[1:]
+            start_time = float(start_time.strip())
+            finish_time = float(finish_time.strip())
+            if time.time() - start_time > uptime or (finish_time > 0 and time.time() - finish_time > 600.):
                 xbmcvfs.delete(txt)
             else:
                 active_downloads.append(progress)
