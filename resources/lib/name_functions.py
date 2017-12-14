@@ -112,3 +112,14 @@ def get_dest(title, url, look_for_duplicates=True, make_directories=True):
                         i += 1
 
     return dest, temp_dest
+
+
+def get_tracking_folder():
+    tracking_folder = xbmcaddon.Addon('script.remote_downloader').getSetting('local_temp_folder')
+    if tracking_folder == '':
+        tracking_folder = xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/tracking/')
+    
+    if not xbmcvfs.exists(tracking_folder):
+        xbmcvfs.mkdirs(tracking_folder)
+    
+    return tracking_folder

@@ -51,14 +51,7 @@ class Download(object):
         
         # the file where progress will be tracked
         if self.track:
-            self.progress_file = xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/downloads/{0}.txt'.format(self.basename))
-            i = 0
-            while xbmcvfs.exists(self.progress_file):
-                i += 1
-                self.progress_file = xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/downloads/{0} ({1}).txt'.format(self.basename, i))
-                
-            if not xbmcvfs.exists(os.path.dirname(self.progress_file)):
-                xbmcvfs.mkdirs(os.path.dirname(self.progress_file))
+            self.progress_file = os.path.join(name_functions.get_tracking_folder(), 'TRACKER {0}.txt'.format(self.basename))
 
         # download-tracking variables
         total = 0
@@ -178,7 +171,7 @@ class Download(object):
         
         """
         with open(self.progress_file, 'w') as f:
-            f.write('{0}\n[COLOR forestgreen]{1:3d}%[/COLOR]  {2}'.format(self.start_time, int(percent), self.basename))
+            f.write('{0}\n{1}\n[COLOR forestgreen]{2:3d}%[/COLOR]  {3}'.format('script.remote_downloader', self.start_time, int(percent), self.basename))
         
     def notification(self, percent):
         """Show a notification of the download progress

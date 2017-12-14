@@ -8,6 +8,7 @@ import xbmcvfs
 
 from . import helper_functions
 from . import json_functions
+from . import name_functions
 
 
 def get_downloads(d_ip, d_port, d_user, d_pass, r_ip, r_port, r_user, r_pass):
@@ -18,21 +19,23 @@ def get_downloads(d_ip, d_port, d_user, d_pass, r_ip, r_port, r_user, r_pass):
 
 
 def get_local_downloads(r_ip, r_port, r_user, r_pass):
-    download_folder = xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/downloads/')
-    download_txts = sorted(glob.glob(os.path.join(download_folder, '*.txt')))
+    tracking_folder = name_functions.get_tracking_folder()
+    tracking_txts = sorted(glob.glob(os.path.join(tracking_folder, 'TRACKER *.txt')))
     
     active_downloads = []
     
     uptime = get_uptime()
         
-    for txt in download_txts:
+    for txt in tracking_txts:
         with open(txt, 'r') as f:
-            start_time, progress = f.readlines()
-            
-        if time.time() - float(start_time) > uptime:
-            xbmcvfs.delete(txt)
-        else:
-            active_downloads.append(progress)
+            lines = f.readlines()
+        
+        if len(lines) == 3 and lines[0] == 'script.remote_downloader\n':
+            start_time, progress = lines[1:]
+            if time.time() - float(start_time.strip()) > uptime:
+                xbmcvfs.delete(txt)
+            else:
+                active_downloads.append(progress)
         
     params = {'action': 'show_downloads', 'download_string': '\n'.join(active_downloads)}
     method = 'Addons.ExecuteAddon'
