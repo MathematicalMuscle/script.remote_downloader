@@ -166,7 +166,7 @@ if __name__ == "__main__":
         """Get a string of the current download(s) and their progress from the downloading system
         
         """
-        d_ip, d_port, d_user, d_pass = helper_functions.get_downloading_system()
+        d_ip, d_port, d_user, d_pass = helper_functions.get_downloading_system(ip, port, username, password)
         tracking.get_downloads(d_ip, d_port, d_user, d_pass, ip, port, username, password)
         sys.exit()
     
@@ -302,11 +302,7 @@ if __name__ == "__main__":
         method = 'Addons.ExecuteAddon'
 
         # send a download request to the downloading system
-        d_ip, d_port, d_user, d_pass = helper_functions.get_downloading_system()
-        if d_ip is not None:
-            if json_functions.jsonrpc(method='JSONRPC.Ping', ip=ip, port=port, username=username, password=password, timeout=5) != 'pong':
-                xbmcgui.Dialog().ok('Remote Downloader', "Error: please specify the correct IP address for this system")
-                sys.exit()
+        d_ip, d_port, d_user, d_pass = helper_functions.get_downloading_system(ip, port, username, password)
         
         params = {'action': 'request_download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize,
                   'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
