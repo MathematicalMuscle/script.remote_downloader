@@ -298,17 +298,16 @@ if __name__ == "__main__":
             xbmcgui.Dialog().ok('Remote Downloader', 'Error: video is 0 MB')
             sys.exit()
 
-        # JSON-RPC arguments
-        method = 'Addons.ExecuteAddon'
-
-        # send a download request to the downloading system
+        # identify the downloading system
         d_ip, d_port, d_user, d_pass = helper_functions.get_downloading_system(ip, port, username, password)
         
+        # send a download request to the downloading system
+        method = 'Addons.ExecuteAddon'
         params = {'action': 'request_download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize,
                   'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
                   'r_ip': ip, 'r_port': port, 'r_user': username, 'r_pass': password}
         
-        result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
+        result = json_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
         sys.exit()
 
     # ================================================== #
