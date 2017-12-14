@@ -10,7 +10,7 @@ import os
 import re
 import urlparse
 
-from . import simple
+from . import helper_functions
 
 
 def trans(text):
@@ -74,7 +74,7 @@ def get_dest(title, url, look_for_duplicates=True, make_directories=True):
         xbmcvfs.mkdirs(dest)
 
     # add the extension
-    url0 = simple.get_url0(url)
+    url0 = helper_functions.get_url0(url)
     ext = os.path.splitext(urlparse.urlparse(url0).path)[1][1:]
     if ext not in ['mp4', 'mkv', 'flv', 'avi', 'mpg']:
         ext = 'mp4'

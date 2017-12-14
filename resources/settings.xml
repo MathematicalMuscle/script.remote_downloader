@@ -3,6 +3,7 @@
   <category label="32000">
     <!-- Local Kodi -->
     <setting label="32001" id="download_local" type="select" values="Yes|No|If remote unavailable" default="No"/>
+    <setting label="32007" id="track_downloads" type="bool" default="false"/>
     <setting label="32002" id="local_movies_folder" type="folder" source="videos"/>
     <setting label="32003" id="local_movies_own_folder" type="bool" default="false"/>
     <setting label="32004" id="local_tv_folder" type="folder" source="videos"/>

@@ -10,7 +10,6 @@ import json
 import sys
 
 from . import helper_functions
-from . import simple
 
 
 def get_now_playing():
@@ -50,7 +49,7 @@ def process_now_playing():
         sys.exit()
 
     # determine whether the file can be downloaded
-    headers = simple.get_headers(url)
+    headers = helper_functions.get_headers(url)
     _, bytesize, _ = helper_functions.resp_bytesize_resumable(url, headers)
     if bytesize is None:
         sys.exit()
