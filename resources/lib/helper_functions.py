@@ -66,11 +66,14 @@ def get_downloading_system(r_ip, r_port, r_user, r_pass):
             d_pass = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_password{0}'.format(i+1))
 
             if d_ip:
-                if json_functions.jsonrpc(method='JSONRPC.Ping', ip=r_ip, port=r_port, username=r_user, password=r_pass, timeout=5) == 'pong':
-                    return d_ip, d_port, d_user, d_pass
-                else:
-                    xbmcgui.Dialog().ok('Remote Downloader', "Error: please specify the correct IP address for this system")
-                    sys.exit()
+                # check that the remote system is available
+                if json_functions.jsonrpc(method='JSONRPC.Ping', ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5) == 'pong':
+                    # check that the remote system will be able to communicate with this system
+                    if json_functions.jsonrpc(method='JSONRPC.Ping', ip=r_ip, port=r_port, username=r_user, password=r_pass, timeout=5) == 'pong':
+                        return d_ip, d_port, d_user, d_pass
+                    else:
+                        xbmcgui.Dialog().ok('Remote Downloader', "Error: please specify the correct IP address for this system")
+                        sys.exit()
 
         # no remote Kodi systems available ==> download it locally?
         if xbmcaddon.Addon('script.remote_downloader').getSetting('download_local') == 'If remote unavailable':
