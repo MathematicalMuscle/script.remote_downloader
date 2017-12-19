@@ -4,6 +4,7 @@
 
 import xbmc
 import xbmcaddon
+import xbmcgui
 import xbmcvfs
 
 import os
@@ -27,6 +28,24 @@ def title_substitutions(title):
                 title = eval(line.strip())
 
     return title
+    
+    
+def add_substitution(old=None, new=None):
+    if old is None:
+        old = xbmcgui.Dialog().input('Old regex')
+        
+    if old:
+        if new is None:
+            new = xbmcgui.Dialog().input('New regex')
+        
+        if new:
+            new_substitution = 're.sub(r"{0}", r"{1}", title)'.format(old, new)
+            with open(xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/title_regex_substitutions.txt'), 'r') as f:
+                text = f.read()
+                
+            if new_substitution not in text:
+                with open(xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/title_regex_substitutions.txt'), 'a') as f:
+                    f.write('re.sub(r"{0}", r"{1}", title)'.format(old, new))
 
 
 def get_title(title):

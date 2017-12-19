@@ -6,12 +6,38 @@ import sys
 import xbmc
 import xbmcaddon
 import xbmcgui
+import xbmcvfs
 
+from . import helper_functions
 from . import json_functions
 from . import modify_addons
+from . import name_functions
 
 
 def menu():
+    autoexec_action = helper_functions.autoexec_status()
+    autoexec_opt = 'Remove \'Restart remote UPnP server\' from `autoexec.py`' if autoexec_action.startswith('delete') else 'Add \'Restart remote UPnP server\' to `autoexec.py`'
+    
+    #autoexec = xbmc.translatePath('special://userdata/autoexec.py')
+    #autoexec_import = 'import xbmc'
+    #autoexec_command = 'xbmc.executebuiltin("RunAddon(script.remote_downloader, \\"{\'action\':\'restart_upnp\'}\\")")'
+    #autoexec_str = autoexec_import + '\n\n' + autoexec_command
+    
+    # determine whether or not 'Restart remote UPnP server' is already in `autoexec.py`
+    #if not xbmcvfs.exists(autoexec):
+    #    autoexec_opt = 'Add \'Restart remote UPnP server\' to `autoexec.py`'
+    #else:
+    #    with open(autoexec, 'r') as f:
+    #        text = f.read()
+    #    if autoexec_str not in text:
+    #        autoexec_opt = 'Add \'Restart remote UPnP server\' to `autoexec.py`'
+    #    else:
+    #        autoexec_opt = 'Remove \'Restart remote UPnP server\' from `autoexec.py`'
+    #        if text == autoexec_str:
+    #            autoexec_delete = True
+    #        else:
+    #            autoexec_delete = False
+            
     if xbmc.Player().isPlayingVideo():
         opts = ['Download current video']
     else:
@@ -24,6 +50,8 @@ def menu():
              'Clean remote video library',
              'Update remote video library',
              'Update remote addons',
+             # 'Add a title regex substitution',
+             autoexec_opt,
              'Restart remote UPnP server']
 
     len_opts = len(opts)
@@ -53,6 +81,17 @@ def menu():
             params = {'action': 'restart_upnp'}
             method = 'Addons.ExecuteAddon'
             result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
+            sys.exit()
+            
+        elif selection == 'Add a title regex substitution':
+            name_functions.add_substitution()
+            sys.exit()
+        
+        elif selection == autoexec_opt:
+            if autoexec_opt.startswith('Add'):
+                helper_functions.autoexec_add_remove(add_remove='add')
+            else:
+                helper_functions.autoexec_add_remove(add_remove='remove')
             sys.exit()
             
         else:

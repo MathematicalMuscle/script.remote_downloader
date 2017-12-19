@@ -86,7 +86,7 @@ if __name__ == "__main__":
     title_regex_substitutions = 'special://userdata/addon_data/script.remote_downloader/title_regex_substitutions.txt'
     if not xbmcvfs.exists(title_regex_substitutions):
         with open(xbmc.translatePath(title_regex_substitutions), 'w') as f:
-            f.write('# enter regular expressions here\n# EXAMPLE: re.sub(r"^Old Title (S[0-9]+\s?E[0-9]+)\\Z", r"New Title \\1", s)')
+            f.write(r'# enter regular expressions here\n# EXAMPLE: re.sub(r"^Old Title (S[0-9]+\s?E[0-9]+)\Z", r"New Title \1", title)')
 
     # ================================================== #
     #                                                    #
@@ -187,6 +187,23 @@ if __name__ == "__main__":
         """
         download_string = params.get('download_string')
         tracking.show_downloads(download_string)
+        sys.exit()
+        
+    if action == 'add_regex_substitution':
+        """Add a regex substitution to `title_regex_substitutions.txt`
+        
+        """
+        old = params.get('old')
+        new = params.get('new')
+        if old and new:
+            name_functions.add_substitution(old, new)
+        sys.exit()
+        
+    if action == 'autoexec_add_remove':
+        """Add or remove 'Restart remote UPnP server' from `autoexec.py`
+        
+        """
+        helper_functions.autoexec_add_remove(params.get('add_remove'))
         sys.exit()
 
     # ================================================== #

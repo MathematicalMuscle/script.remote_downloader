@@ -4,13 +4,22 @@
 
 import sys
 
+import xbmc
 import xbmcaddon
 import xbmcgui
+import xbmcvfs
 
 import urllib2
 import urlparse
 
 from . import json_functions
+
+
+# variables relating to `autoexec.py`
+autoexec = xbmc.translatePath('special://userdata/autoexec.py')
+autoexec_import = 'import xbmc'
+autoexec_command = 'xbmc.executebuiltin("RunAddon(script.remote_downloader, \\"{\'action\':\'restart_upnp\'}\\")")'
+autoexec_str = autoexec_import + '\n\n' + autoexec_command
 
 
 def get_url0(url):
@@ -81,3 +90,53 @@ def get_downloading_system(r_ip, r_port, r_user, r_pass):
         else:
             xbmcgui.Dialog().ok('Remote Downloader', 'Error: no Kodi system available for downloading')
             sys.exit()
+            
+
+def autoexec_status():
+    # determine whether or not 'Restart remote UPnP server' is already in `autoexec.py`
+    if not xbmcvfs.exists(autoexec):
+        return 'create' #autoexec_opt = 'Add \'Restart remote UPnP server\' to `autoexec.py`'
+    else:
+        with open(autoexec, 'r') as f:
+            text = f.read()
+        if autoexec_import not in text:
+            return 'add_both'
+        elif autoexec_command not in text:
+            return 'add_command' #autoexec_opt = 'Add \'Restart remote UPnP server\' to `autoexec.py`'
+        else:
+            if text.strip() == autoexec_import + '\n\n' + autoexec_command:
+                return 'delete_file'
+            else:
+                return 'delete_command'
+            autoexec_opt = 'Remove \'Restart remote UPnP server\' from `autoexec.py`'
+            if text == autoexec_str:
+                autoexec_delete = True
+            else:
+                autoexec_delete = False
+
+
+def autoexec_add_remove(add_remove=None):
+    # add or remove 'Restart remote UPnP server' from `autoexec.py`
+    status = autoexec_status()
+    
+    if add_remove == 'add':
+        if status == 'create':
+            with open(autoexec, 'w') as f:
+                f.write(autoexec_import + '\n\n' + autoexec_command)
+        elif status == 'add_both':
+            with open(autoexec, 'a') as f:
+                f.write(autoexec_import + '\n\n' + autoexec_command)
+        elif status == 'add_command':
+            with open(autoexec, 'a') as f:
+                f.write(autoexec_command)
+                
+    elif add_remove == 'remove':
+        if status == 'delete_file':
+            xbmcvfs.delete(autoexec)
+        else:
+            with open(autoexec, 'r') as f:
+                text = f.read()
+                
+            with open(autoexec, 'w') as f:
+                f.write(text.replace(autoexec_command + '\n', '').replace(autoexec_command, ''))
+        

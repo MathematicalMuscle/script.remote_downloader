@@ -201,9 +201,9 @@ class Download(object):
             text += '[CR]'
 
         if success:
-            text += '%s : %s' % (self.basename, '[COLOR forestgreen]Download succeeded[/COLOR]')
+            text += '{0} : {1}'.format(self.basename, '[COLOR forestgreen]Download succeeded[/COLOR]')
         else:
-            text += '%s : %s' % (self.basename, '[COLOR red]Download failed[/COLOR]')
+            text += '{0} : {1}'.format(self.basename, '[COLOR red]Download failed[/COLOR]')
             self.delete_tracker()
 
         xbmcgui.Window(10000).setProperty('GEN-DOWNLOADED', text)
