@@ -18,26 +18,6 @@ def menu():
     autoexec_action = helper_functions.autoexec_status()
     autoexec_opt = 'Remove \'Restart remote UPnP server\' from `autoexec.py`' if autoexec_action.startswith('delete') else 'Add \'Restart remote UPnP server\' to `autoexec.py`'
     
-    #autoexec = xbmc.translatePath('special://userdata/autoexec.py')
-    #autoexec_import = 'import xbmc'
-    #autoexec_command = 'xbmc.executebuiltin("RunAddon(script.remote_downloader, \\"{\'action\':\'restart_upnp\'}\\")")'
-    #autoexec_str = autoexec_import + '\n\n' + autoexec_command
-    
-    # determine whether or not 'Restart remote UPnP server' is already in `autoexec.py`
-    #if not xbmcvfs.exists(autoexec):
-    #    autoexec_opt = 'Add \'Restart remote UPnP server\' to `autoexec.py`'
-    #else:
-    #    with open(autoexec, 'r') as f:
-    #        text = f.read()
-    #    if autoexec_str not in text:
-    #        autoexec_opt = 'Add \'Restart remote UPnP server\' to `autoexec.py`'
-    #    else:
-    #        autoexec_opt = 'Remove \'Restart remote UPnP server\' from `autoexec.py`'
-    #        if text == autoexec_str:
-    #            autoexec_delete = True
-    #        else:
-    #            autoexec_delete = False
-            
     if xbmc.Player().isPlayingVideo():
         opts = ['Download current video']
     else:

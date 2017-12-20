@@ -145,13 +145,13 @@ class Download(object):
             if error:
                 errors += 1
                 count  += 1
-                xbmc.log('script.remote_downloader: ' + '{0} Error(s) whilst downloading {1}'.format(count, self.dest))
+                xbmc.log('script.remote_downloader: {0} Error(s) whilst downloading {1}'.format(count, self.dest))
                 xbmc.sleep(sleep*1000)
 
             if (resumable and errors > 0) or errors >= 10:
                 if (not resumable and resume >= 50) or resume >= 500:
                     #Give up!
-                    xbmc.log('script.remote_downloader: ' + '{0} download canceled - too many error whilst downloading'.format(self.dest))
+                    xbmc.log('script.remote_downloader: {0} download canceled - too many error whilst downloading'.format(self.dest))
                     self.done(False)
                     sys.exit()
 
@@ -160,7 +160,7 @@ class Download(object):
                 if resumable:
                     chunks  = []
                     #create new response
-                    xbmc.log('script.remote_downloader: ' + 'Download resumed ({0}) {1}'.format(resume, self.dest))
+                    xbmc.log('script.remote_downloader: Download resumed ({0}) {1}'.format(resume, self.dest))
                     resp, _, _ = helper_functions.resp_bytesize_resumable(self.url, headers, total)
                 else:
                     #use existing response

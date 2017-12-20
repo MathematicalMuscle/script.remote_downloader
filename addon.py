@@ -45,21 +45,10 @@ from resources.lib import tracking
 from resources.lib.modify_addons import modify_addons
 
 
-# info about this system
-ip = xbmcaddon.Addon('script.remote_downloader').getSetting('local_ip_address')
-if ip == "0.0.0.0":
-    xbmcaddon.Addon('script.remote_downloader').setSetting('local_ip_address', '')
-    ip = ''
-if not ip:
-    ip = xbmc.getIPAddress()
-port = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverport"}}'))['result']['value']
-username = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverusername"}}'))['result']['value']
-password = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverpassword"}}'))['result']['value']
-
 # reset '0.0.0.0' IP addresses
-for i in range(5):
-    if xbmcaddon.Addon('script.remote_downloader').getSetting('remote_ip_address{0}'.format(i+1)) == '0.0.0.0':
-        xbmcaddon.Addon('script.remote_downloader').setSetting('remote_ip_address{0}'.format(i+1), '')
+for ip_address in ['local_ip_address'] + ['remote_ip_address{0}'.format(i+1) for i in range(5)]:
+    if xbmcaddon.Addon('script.remote_downloader').getSetting(ip_address) == '0.0.0.0':
+        xbmcaddon.Addon('script.remote_downloader').setSetting(ip_address, '')
 
 
 if __name__ == "__main__":
@@ -165,9 +154,9 @@ if __name__ == "__main__":
     if action == 'get_downloads':
         """Get a string of the current download(s) and their progress from the downloading system
         
-        """
-        d_ip, d_port, d_user, d_pass = helper_functions.get_downloading_system(ip, port, username, password)
-        tracking.get_downloads(d_ip, d_port, d_user, d_pass, ip, port, username, password)
+        """        
+        d_ip, d_port, d_user, d_pass, r_ip, r_port, r_user, r_pass = helper_functions.get_system_addresses()
+        tracking.get_downloads(d_ip, d_port, d_user, d_pass, r_ip, r_port, r_user, r_pass)
         sys.exit()
     
     if action == 'get_local_downloads':
@@ -273,14 +262,6 @@ if __name__ == "__main__":
             image for the stream
         bytesize : int
             file size of the download in bytes
-        r_ip : str
-            requesting system IP address (if downloading remotely)
-        r_port : str
-            requesting system port (if downloading remotely)
-        r_user : str
-            requesting system username (if downloading remotely)
-        r_pass : str
-            requesting system password (if downloading remotely)
         d_ip : str
             downloading system IP address (if downloading remotely)
         d_port : str
@@ -289,6 +270,14 @@ if __name__ == "__main__":
             downloading system username (if downloading remotely)
         d_pass : str
             downloading system password (if downloading remotely)
+        r_ip : str
+            requesting system IP address (if downloading remotely)
+        r_port : str
+            requesting system port (if downloading remotely)
+        r_user : str
+            requesting system username (if downloading remotely)
+        r_pass : str
+            requesting system password (if downloading remotely)
 
         """
         title = name_functions.get_title(params.get('title'))
@@ -315,14 +304,14 @@ if __name__ == "__main__":
             xbmcgui.Dialog().ok('Remote Downloader', 'Error: video is 0 MB')
             sys.exit()
 
-        # identify the downloading system
-        d_ip, d_port, d_user, d_pass = helper_functions.get_downloading_system(ip, port, username, password)
+        # identify the requesting and downloading systems
+        d_ip, d_port, d_user, d_pass, r_ip, r_port, r_user, r_pass = helper_functions.get_system_addresses()
         
         # send a download request to the downloading system
         method = 'Addons.ExecuteAddon'
         params = {'action': 'request_download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize,
                   'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
-                  'r_ip': ip, 'r_port': port, 'r_user': username, 'r_pass': password}
+                  'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
         
         result = json_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
         sys.exit()
@@ -388,6 +377,14 @@ if __name__ == "__main__":
             downloading system username (if downloading remotely)
         d_pass : str
             downloading system password (if downloading remotely)
+        r_ip : str
+            requesting system IP address (if downloading remotely)
+        r_port : str
+            requesting system port (if downloading remotely)
+        r_user : str
+            requesting system username (if downloading remotely)
+        r_pass : str
+            requesting system password (if downloading remotely)
 
         """
         title = name_functions.get_title(params.get('title'))
@@ -421,7 +418,8 @@ if __name__ == "__main__":
 
         if d_ip:
             params = {'action': 'confirm_download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize, 'basename': basename,
-                      'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass}
+                      'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
+                      'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
             json_functions.jsonrpc(method, params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
 
         else:
@@ -462,6 +460,14 @@ if __name__ == "__main__":
             downloading system username (if downloading remotely)
         d_pass : str
             downloading system password (if downloading remotely)
+        r_ip : str
+            requesting system IP address (if downloading remotely)
+        r_port : str
+            requesting system port (if downloading remotely)
+        r_user : str
+            requesting system username (if downloading remotely)
+        r_pass : str
+            requesting system password (if downloading remotely)
 
         Returns
         -------
@@ -508,10 +514,10 @@ if __name__ == "__main__":
         d_pass = params.get('d_pass')
 
         # info about the requesting Kodi system
-        r_ip = ip
-        r_port = port
-        r_user = username
-        r_pass = password
+        r_ip = params.get('r_ip')
+        r_port = params.get('r_port')
+        r_user = params.get('r_user')
+        r_pass = params.get('r_pass')
         
         # track the download progress?
         track = xbmcaddon.Addon('script.remote_downloader').getSetting('track_downloads') == 'true'
