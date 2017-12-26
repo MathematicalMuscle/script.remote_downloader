@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.remote_downloader" name="Remote Downloader" version="0.1.32" provider-name="Mathematical Muscle">
+<addon id="script.remote_downloader" name="Remote Downloader" version="0.1.33" provider-name="Mathematical Muscle">
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>
         <import addon="script.common.plugin.cache" version="0.9.1" />
@@ -72,5 +72,6 @@
         v0.1.30 (2017-12-15) - Ping both the requesting and downloading Kodi systems before proceeding
         v0.1.31 (2017-12-18) - Enable adding/removing 'Restart remote UPnP server' from 'autoexec.py'; enable creating regex substitutions via json-rpc
         v0.1.32 (2017-12-19) - Improved method for determining local IP address
+        v0.1.33 (2017-12-26) - Improved tracking of failed downloads
     </news>
 </addon>

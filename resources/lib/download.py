@@ -170,8 +170,13 @@ class Download(object):
         """Track the download progress
         
         """
-        with open(self.progress_file, 'w') as f:
-            f.write('{0}\n{1}\n{2}\n[COLOR forestgreen]{3:3d}%[/COLOR]  {4}'.format('script.remote_downloader', self.start_time, finish_time, int(percent), self.basename))
+        # percent is a number ==> track as usual
+        if isinstance(percent, float) or isinstance(percent, int):
+            with open(self.progress_file, 'w') as f:
+                f.write('{0}\n{1}\n{2}\n[COLOR forestgreen]{3:3d}%[/COLOR]  {4}'.format('script.remote_downloader', self.start_time, finish_time, int(percent), self.basename))
+        else:
+            with open(self.progress_file, 'w') as f:
+                f.write('{0}\n{1}\n{2}\n[COLOR red]{3}[/COLOR]  {4}'.format('script.remote_downloader', self.start_time, finish_time, percent, self.basename))
         
     def notification(self, percent):
         """Show a notification of the download progress
@@ -193,7 +198,6 @@ class Download(object):
         """Show a success message
         
         """
-        self.track_progress(100, time.time())
         playing = xbmc.Player().isPlaying()
         text = xbmcgui.Window(10000).getProperty('GEN-DOWNLOADED')
 
@@ -201,10 +205,11 @@ class Download(object):
             text += '[CR]'
 
         if success:
+            self.track_progress(100, time.time())
             text += '{0} : {1}'.format(self.basename, '[COLOR forestgreen]Download succeeded[/COLOR]')
         else:
+            self.track_progress('FAILED', time.time())
             text += '{0} : {1}'.format(self.basename, '[COLOR red]Download failed[/COLOR]')
-            self.delete_tracker()
 
         xbmcgui.Window(10000).setProperty('GEN-DOWNLOADED', text)
 
