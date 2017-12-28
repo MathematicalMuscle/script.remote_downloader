@@ -194,6 +194,14 @@ if __name__ == "__main__":
         """
         helper_functions.autoexec_add_remove(params.get('add_remove'))
         sys.exit()
+        
+    if action == 'dialog_ok':
+        """Show an `xbmcgui.Dialog().ok` message
+        
+        """
+        heading = params.get('heading')
+        line = params.get('line')
+        xbmcgui.Dialog().ok(heading, line)
 
     # ================================================== #
     #                                                    #
@@ -408,7 +416,7 @@ if __name__ == "__main__":
         method = 'Addons.ExecuteAddon'
 
         # get the name of the file to be created
-        dest, _ = name_functions.get_dest(title, url, make_directories=False)
+        dest, _ = name_functions.get_dest(title, url)
         if isinstance(dest, str):
             # `dest` is a string --> get the basename
             basename = os.path.basename(dest)

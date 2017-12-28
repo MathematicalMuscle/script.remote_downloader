@@ -56,7 +56,7 @@ def remove_extension(f):
     return '.'.join(os.path.basename(f).split('.')[:-1])
 
 
-def get_dest(title, url, look_for_duplicates=True, make_directories=True):
+def get_dest(title, url, look_for_duplicates=True):
     transname = title_substitutions(trans(title))
 
     name = re.compile('(.+?)\sS(\d*)E\d*$').findall(title)
@@ -87,10 +87,6 @@ def get_dest(title, url, look_for_duplicates=True, make_directories=True):
 
         # add the season
         dest = os.path.join(dest, 'Season {0:01d}'.format(int(name[0][1])))
-
-    # make the directory?
-    if make_directories:
-        xbmcvfs.mkdirs(dest)
 
     # add the extension
     url0 = helper_functions.get_url0(url)

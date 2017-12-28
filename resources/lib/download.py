@@ -33,21 +33,25 @@ class Download(object):
         """Download the stream
         
         """
-        # determine whether the file can be downloaded
-        headers = helper_functions.get_headers(self.url)
-        resp, _, resumable = helper_functions.resp_bytesize_resumable(self.url, headers)
-        self.dest, self.temp_dest = name_functions.get_dest(self.title, self.url)
-
-        if resp is None or self.dest is None:
-            sys.exit()
-            
-        # the size of the file in MB
-        mbsize = self.bytesize / (1024 * 1024)
-
         # the name of the file to be created
+        self.dest, self.temp_dest = name_functions.get_dest(self.title, self.url)
         basename = os.path.basename(self.dest)
         basename = basename.split('.')
         self.basename = '.'.join(basename[:-1])
+        
+        # determine whether the file can be downloaded
+        headers = helper_functions.get_headers(self.url)
+        resp, _, resumable = helper_functions.resp_bytesize_resumable(self.url, headers)
+
+        if resp is None or self.dest is None:
+            self.dialog_ok('ERROR: download could not be initiated')
+            sys.exit()
+        
+        # create the destination directory, if it doesn't already exist
+        xbmcvfs.mkdirs(os.path.dirname(self.dest))
+            
+        # the size of the file in MB
+        mbsize = self.bytesize / (1024 * 1024)
         
         # the file where progress will be tracked
         if self.track:
@@ -151,7 +155,7 @@ class Download(object):
             if (resumable and errors > 0) or errors >= 10:
                 if (not resumable and resume >= 50) or resume >= 500:
                     #Give up!
-                    xbmc.log('script.remote_downloader: {0} download canceled - too many error whilst downloading'.format(self.dest))
+                    xbmc.log('script.remote_downloader: {0} download canceled - too many errors whilst downloading'.format(self.dest))
                     self.done(False)
                     sys.exit()
 
@@ -166,36 +170,49 @@ class Download(object):
                     #use existing response
                     pass
                 
-    def track_progress(self, percent, finish_time=-1.):
+    def track_progress(self, status, finish_time=-1.):
         """Track the download progress
         
         """
-        # percent is a number ==> track as usual
-        if isinstance(percent, float) or isinstance(percent, int):
+        # `status` is a number (percent)
+        if isinstance(status, float) or isinstance(status, int):
             with open(self.progress_file, 'w') as f:
-                f.write('{0}\n{1}\n{2}\n[COLOR forestgreen]{3:3d}%[/COLOR]  {4}'.format('script.remote_downloader', self.start_time, finish_time, int(percent), self.basename))
+                f.write('{0}\n{1}\n{2}\n[COLOR forestgreen]{3:3d}%[/COLOR]  {4}'.format('script.remote_downloader', self.start_time, finish_time, int(status), self.basename))
+                
+        # `status` is a failure message
         else:
             with open(self.progress_file, 'w') as f:
-                f.write('{0}\n{1}\n{2}\n[COLOR red]{3}[/COLOR]  {4}'.format('script.remote_downloader', self.start_time, finish_time, percent, self.basename))
+                f.write('{0}\n{1}\n{2}\n[COLOR red]{3}[/COLOR]  {4}'.format('script.remote_downloader', self.start_time, finish_time, status, self.basename))
         
-    def notification(self, percent):
+    def notification(self, status):
         """Show a notification of the download progress
         
         """
-        if self.image:
-            msg_params = {'title': str(percent) + '% - ' + self.basename, 'message': self.dest, 'displaytime': 10000, 'image': self.image}
-            xbmc.executebuiltin("XBMC.Notification({title},{message},{displaytime},{image})".format(**msg_params))
+        # `status` is a number (percent)
+        if isinstance(status, float) or isinstance(status, int):
+            msg_params = {'title': '{0}% - {1}'.format(int(status), self.basename), 'message': self.dest, 'displaytime': 10000}
+            
+        # `status` is a failure message
         else:
-            msg_params = {'title': str(percent) + '% - ' + self.basename, 'message': self.dest, 'displaytime': 10000}
-            xbmc.executebuiltin("XBMC.Notification({title},{message},{displaytime})".format(**msg_params))
+            msg_params = {'title': status, 'message': self.dest, 'displaytime': 10000}
+            
+        # include the image in the notification, if there is one
+        if self.image is not None:
+            msg_params['image'] = self.image
+            
+        # show a notification on this system
+        result = json_functions.jsonrpc("GUI.ShowNotification", msg_params)
 
         # send a notification to the Kodi that sent the download command
         if self.r_ip:
-            method = "GUI.ShowNotification"
-            result = json_functions.jsonrpc(method, msg_params, None, self.r_ip, self.r_port, self.r_user, self.r_pass)
+            result = json_functions.jsonrpc("GUI.ShowNotification", msg_params, None, self.r_ip, self.r_port, self.r_user, self.r_pass)
+    
+    def dialog_ok(self, line, heading='Remote Downloader'):
+        params = {'action': 'dialog_ok', 'line': line, 'heading': heading}
+        result = json_functions.jsonrpc('Addons.ExecuteAddon', params, 'script.remote_downloader', self.r_ip, self.r_port, self.r_user, self.r_pass)
             
     def done(self, success):
-        """Show a success message
+        """Show a success/failure message
         
         """
         playing = xbmc.Player().isPlaying()
@@ -213,7 +230,10 @@ class Download(object):
 
         xbmcgui.Window(10000).setProperty('GEN-DOWNLOADED', text)
 
-        if not success or not playing:
+        if not success:
+            self.dialog_ok('{0} : {1}'.format(self.basename, '[COLOR red]Download failed[/COLOR]'))
+        
+        elif not playing:
             xbmcgui.Dialog().ok(self.title, text)
             xbmcgui.Window(10000).clearProperty('GEN-DOWNLOADED')
             
