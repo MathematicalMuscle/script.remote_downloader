@@ -303,7 +303,8 @@ if __name__ == "__main__":
 
         # determine whether the file can be downloaded
         if bytesize is None:
-            _, bytesize, _ = helper_functions.resp_bytesize_resumable(url, headers)
+            resp, bytesize, _ = helper_functions.resp_bytesize_resumable(url, headers)
+            url = resp.geturl()
             if bytesize is None:
                 sys.exit()
 
