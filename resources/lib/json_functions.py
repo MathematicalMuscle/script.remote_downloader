@@ -27,7 +27,7 @@ def jsonrpc(method, params=None, addonid=None, ip=None, port=None, username=None
 
     # local JSON-RPC
     if ip is None:
-        response = eval(xbmc.executeJSONRPC(data).replace(':true', ':True').replace(':false', ':False'))
+        response = json.loads(xbmc.executeJSONRPC(data))
 
     # remote JSON-RPC
     else:
