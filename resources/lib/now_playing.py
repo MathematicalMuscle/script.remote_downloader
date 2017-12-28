@@ -10,6 +10,7 @@ import json
 import sys
 
 from . import helper_functions
+from . import json_functions
 
 
 def get_now_playing():
@@ -18,12 +19,8 @@ def get_now_playing():
     https://stackoverflow.com/a/38436735/8023447
 
     """
-    request = json.dumps({'jsonrpc': '2.0',
-                          'method': 'Player.GetItem',
-                          'params': {'playerid': 1,
-                                     'properties': ['file', 'showtitle', 'season', 'episode', 'thumbnail']},
-                          'id': '1'})
-    return eval(json.dumps(json.loads(xbmc.executeJSONRPC(request))['result']['item']))
+    params = {'playerid': 1, 'properties': ['file', 'showtitle', 'season', 'episode', 'thumbnail']}
+    return json_functions.jsonrpc('Player.GetItem', params)['item']
 
 
 def process_now_playing():

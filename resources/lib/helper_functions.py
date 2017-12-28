@@ -35,7 +35,7 @@ def get_headers(url):
     return headers
 
 
-def resp_bytesize_resumable(url, headers, size=0):
+def resp_bytesize_resumable(url, headers, size=0, r_ip=None, r_port=None, r_user=None, r_pass=None):
     try:
         if size > 0:
             size = int(size)
@@ -46,13 +46,15 @@ def resp_bytesize_resumable(url, headers, size=0):
         resp = urllib2.urlopen(req, timeout=30)
 
     except:
-        xbmcgui.Dialog().ok('Remote Downloader', 'Error: no response from server')
+        params = {'action': 'dialog_ok', 'line': 'Error: no response from server', 'heading': 'Remote Downloader'}
+        result = json_functions.jsonrpc('Addons.ExecuteAddon', params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
         return None, None, None
 
     try:
         bytesize = int(resp.headers['Content-Length'])
     except:
-        xbmcgui.Dialog().ok('Remote Downloader', 'Error: unknown filesize')
+        params = {'action': 'dialog_ok', 'line': 'Error: unknown filesize', 'heading': 'Remote Downloader'}
+        result = json_functions.jsonrpc('Addons.ExecuteAddon', params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
         return None, None, None
 
     try:

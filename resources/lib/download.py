@@ -35,16 +35,19 @@ class Download(object):
         """
         # the name of the file to be created
         self.dest, self.temp_dest = name_functions.get_dest(self.title, self.url)
+        if self.dest is None:
+            self.dialog_ok('ERROR: no download destination')
+            sys.exit()
+            
         basename = os.path.basename(self.dest)
         basename = basename.split('.')
         self.basename = '.'.join(basename[:-1])
         
         # determine whether the file can be downloaded
         headers = helper_functions.get_headers(self.url)
-        resp, _, resumable = helper_functions.resp_bytesize_resumable(self.url, headers)
+        resp, _, resumable = helper_functions.resp_bytesize_resumable(self.url, headers, r_ip=self.r_ip, r_port=self.r_port, r_user=self.r_user, r_pass=self.r_pass)
 
-        if resp is None or self.dest is None:
-            self.dialog_ok('ERROR: download could not be initiated')
+        if resp is None:
             sys.exit()
         
         # create the destination directory, if it doesn't already exist
@@ -165,7 +168,7 @@ class Download(object):
                     chunks  = []
                     #create new response
                     xbmc.log('script.remote_downloader: Download resumed ({0}) {1}'.format(resume, self.dest))
-                    resp, _, _ = helper_functions.resp_bytesize_resumable(self.url, headers, total)
+                    resp, _, _ = helper_functions.resp_bytesize_resumable(self.url, headers, total, r_ip=self.r_ip, r_port=self.r_port, r_user=self.r_user, r_pass=self.r_pass)
                 else:
                     #use existing response
                     pass
