@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.remote_downloader" name="Remote Downloader" version="0.1.36" provider-name="Mathematical Muscle">
+<addon id="script.remote_downloader" name="Remote Downloader" version="0.1.37" provider-name="Mathematical Muscle">
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>
         <import addon="script.common.plugin.cache" version="0.9.1" />
@@ -76,5 +76,6 @@
         v0.1.34 (2017-12-28) - Improved notification for download failures
         v0.1.35 (2017-12-28) - Further improved notification for download failures
         v0.1.36 (2017-12-28) - Handle redirected URLs
+        v0.1.37 (2017-12-28) - Minor bug fixes
     </news>
 </addon>

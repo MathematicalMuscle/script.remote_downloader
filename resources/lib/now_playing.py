@@ -48,9 +48,9 @@ def process_now_playing():
     # determine whether the file can be downloaded
     headers = helper_functions.get_headers(url)
     resp, bytesize, _ = helper_functions.resp_bytesize_resumable(url, headers)
-    url = resp.geturl()
     if bytesize is None:
         sys.exit()
+    url = resp.geturl()
 
     image = info['thumbnail']
 
