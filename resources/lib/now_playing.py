@@ -46,11 +46,12 @@ def process_now_playing():
         sys.exit()
 
     # determine whether the file can be downloaded
-    headers = helper_functions.get_headers(url)
-    resp, bytesize, _ = helper_functions.resp_bytesize_resumable(url, headers)
+    resp, bytesize, _ = helper_functions.resp_bytesize_resumable(url)
     if bytesize is None:
         sys.exit()
-    url = resp.geturl()
+    url_redirect = resp.geturl()
+    if url_redirect == url:
+        url_redirect = None
 
     image = info['thumbnail']
 
@@ -131,4 +132,4 @@ def process_now_playing():
         else:
             sys.exit()
 
-    return title, url, image, bytesize
+    return title, url, url_redirect, image, bytesize

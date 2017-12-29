@@ -70,4 +70,7 @@ def from_jsonrpc(parameters):
     if 'url' in params:
         if isinstance(params['url'], str):
             params['url'] = params['url'].replace(' ', '')
+    if 'url_redirect' in params:
+        if isinstance(params['url_redirect'], str):
+            params['url_redirect'] = params['url_redirect'].replace(' ', '')
     return params

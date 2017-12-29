@@ -221,16 +221,18 @@ if __name__ == "__main__":
             title of the stream
         url : str
             URL for the stream
+        url_redirect : str
+            (possibly) redirected URL for the stream
         image : str
             image for the stream
         bytesize : int
             file size of the download in bytes
 
         """
-        title, url, image, bytesize = now_playing.process_now_playing()
+        title, url, url_redirect, image, bytesize = now_playing.process_now_playing()
 
         # download the current video
-        params = {'action': 'prepare_download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize}
+        params = {'action': 'prepare_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize}
         method = 'Addons.ExecuteAddon'
         result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
         sys.exit()
@@ -253,6 +255,8 @@ if __name__ == "__main__":
             title of the stream
         url : str
             URL for the stream
+        url_redirect : str
+            (possibly) redirected URL for the stream
         image : str
             image for the stream
         bytesize : int
@@ -266,6 +270,8 @@ if __name__ == "__main__":
             title of the stream
         url : str
             URL for the stream
+        url_redirect : str
+            (possibly) redirected URL for the stream
         image : str
             image for the stream
         bytesize : int
@@ -290,6 +296,7 @@ if __name__ == "__main__":
         """
         title = name_functions.get_title(params.get('title'))
         url = params.get('url')
+        url_redirect = params.get('url_redirect')
         image = params.get('image')
         bytesize = params.get('bytesize')
 
@@ -298,15 +305,14 @@ if __name__ == "__main__":
             xbmcgui.Dialog().ok('Remote Downloader', 'Error: there is no stream')
             sys.exit()
 
-        # derived parameters
-        headers = helper_functions.get_headers(url)
-
         # determine whether the file can be downloaded
         if bytesize is None:
-            resp, bytesize, _ = helper_functions.resp_bytesize_resumable(url, headers)
+            resp, bytesize, _ = helper_functions.resp_bytesize_resumable(url)
             if bytesize is None:
                 sys.exit()
-            url = resp.geturl()
+            url_redirect = resp.geturl()
+            if url_redirect == url:
+                url_redirect = None
 
         # if the file is < 1 MB, show an error message and stop
         if bytesize < 1024 * 1024:
@@ -318,7 +324,7 @@ if __name__ == "__main__":
         
         # send a download request to the downloading system
         method = 'Addons.ExecuteAddon'
-        params = {'action': 'request_download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize,
+        params = {'action': 'request_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize,
                   'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
                   'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
         
@@ -343,6 +349,8 @@ if __name__ == "__main__":
             title of the stream
         url : str
             URL for the stream
+        url_redirect : str
+            (possibly) redirected URL for the stream
         image : str
             image for the stream
         bytesize : int
@@ -372,6 +380,8 @@ if __name__ == "__main__":
             title of the stream
         url : str
             URL for the stream
+        url_redirect : str
+            (possibly) redirected URL for the stream
         image : str
             image for the stream
         bytesize : int
@@ -398,6 +408,7 @@ if __name__ == "__main__":
         """
         title = name_functions.get_title(params.get('title'))
         url = params.get('url')
+        url_redirect = params.get('url_redirect')
         image = params.get('image')
         bytesize = params.get('bytesize')
 
@@ -426,13 +437,13 @@ if __name__ == "__main__":
             basename = dest
 
         if d_ip:
-            params = {'action': 'confirm_download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize, 'basename': basename,
+            params = {'action': 'confirm_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'basename': basename,
                       'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
                       'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
             json_functions.jsonrpc(method, params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
 
         else:
-            params = {'action': 'confirm_download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize, 'basename': basename}
+            params = {'action': 'confirm_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'basename': basename}
             json_functions.jsonrpc(method, params, 'script.remote_downloader')
 
         sys.exit()
@@ -455,6 +466,8 @@ if __name__ == "__main__":
             title of the stream
         url : str
             URL for the stream
+        url_redirect : str
+            (possibly) redirected URL for the stream
         image : str
             image for the stream
         bytesize : int
@@ -486,6 +499,8 @@ if __name__ == "__main__":
             title of the stream
         url : str
             URL for the stream
+        url_redirect : str
+            (possibly) redirected URL for the stream
         image : str
             image for the stream
         bytesize : int
@@ -512,6 +527,7 @@ if __name__ == "__main__":
         """
         title = params.get('title')
         url = params.get('url')
+        url_redirect = params.get('url_redirect')
         image = params.get('image')
         bytesize = params.get('bytesize')
         basename = params.get('basename')
@@ -555,12 +571,12 @@ if __name__ == "__main__":
             method = 'Addons.ExecuteAddon'
 
             if d_ip:
-                params = {'action': 'download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize, 'track': track,
+                params = {'action': 'download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'track': track,
                           'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
                           'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
                 json_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
             else:
-                params = {'action': 'download', 'title': title, 'url': url, 'image': image, 'bytesize': bytesize, 'track': track}
+                params = {'action': 'download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'track': track}
                 json_functions.jsonrpc(method, params, 'script.remote_downloader')
 
         sys.exit()
@@ -583,6 +599,8 @@ if __name__ == "__main__":
             title of the stream
         url : str
             URL for the stream
+        url_redirect : str
+            (possibly) redirected URL for the stream
         image : str
             image for the stream
         bytesize : int
@@ -609,6 +627,7 @@ if __name__ == "__main__":
         """
         title = name_functions.get_title(params.get('title'))
         url = params.get('url')
+        url_redirect = params.get('url_redirect')
         image = params.get('image')
         bytesize = params.get('bytesize')
 
@@ -627,5 +646,5 @@ if __name__ == "__main__":
         # track the download progress?
         track = params.get('track')
             
-        d = download.Download(title, url, image, bytesize, r_ip, r_port, r_user, r_pass, track)
+        d = download.Download(title, url, url_redirect, image, bytesize, r_ip, r_port, r_user, r_pass, track)
         d.download()

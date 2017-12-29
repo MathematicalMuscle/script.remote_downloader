@@ -35,8 +35,9 @@ def get_headers(url):
     return headers
 
 
-def resp_bytesize_resumable(url, headers, size=0, r_ip=None, r_port=None, r_user=None, r_pass=None):
+def resp_bytesize_resumable(url, url_redirect=None, size=0, r_ip=None, r_port=None, r_user=None, r_pass=None):
     try:
+        headers = get_headers(url)
         if size > 0:
             size = int(size)
             headers['Range'] = 'bytes={0}-'.format(size)
@@ -46,9 +47,20 @@ def resp_bytesize_resumable(url, headers, size=0, r_ip=None, r_port=None, r_user
         resp = urllib2.urlopen(req, timeout=30)
 
     except:
-        params = {'action': 'dialog_ok', 'line': 'Error: no response from server', 'heading': 'Remote Downloader'}
-        result = json_functions.jsonrpc('Addons.ExecuteAddon', params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
-        return None, None, None
+        try:
+            headers = get_headers(url_redirect)
+            if size > 0:
+                size = int(size)
+                headers['Range'] = 'bytes={0}-'.format(size)
+
+            url0 = get_url0(url_redirect)
+            req = urllib2.Request(url0, headers=headers)
+            resp = urllib2.urlopen(req, timeout=30)
+            
+        except:
+            params = {'action': 'dialog_ok', 'line': 'Error: no response from server', 'heading': 'Remote Downloader'}
+            result = json_functions.jsonrpc('Addons.ExecuteAddon', params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
+            return None, None, None
 
     try:
         bytesize = int(resp.headers['Content-Length'])

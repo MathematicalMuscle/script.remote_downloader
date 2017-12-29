@@ -11,9 +11,10 @@ from . import name_functions
 
 
 class Download(object):
-    def __init__(self, title, url, image, bytesize, r_ip, r_port, r_user, r_pass, track):
+    def __init__(self, title, url, url_redirect, image, bytesize, r_ip, r_port, r_user, r_pass, track):
         self.title = title
         self.url = url
+        self.url_redirect = url_redirect
         self.bytesize = bytesize
         self.image = image
         self.r_ip = r_ip
@@ -44,8 +45,7 @@ class Download(object):
         self.basename = '.'.join(basename[:-1])
         
         # determine whether the file can be downloaded
-        headers = helper_functions.get_headers(self.url)
-        resp, _, resumable = helper_functions.resp_bytesize_resumable(self.url, headers, r_ip=self.r_ip, r_port=self.r_port, r_user=self.r_user, r_pass=self.r_pass)
+        resp, _, resumable = helper_functions.resp_bytesize_resumable(self.url, self.url_redirect, r_ip=self.r_ip, r_port=self.r_port, r_user=self.r_user, r_pass=self.r_pass)
 
         if resp is None:
             sys.exit()
@@ -168,7 +168,7 @@ class Download(object):
                     chunks  = []
                     #create new response
                     xbmc.log('script.remote_downloader: Download resumed ({0}) {1}'.format(resume, self.dest))
-                    resp, _, _ = helper_functions.resp_bytesize_resumable(self.url, headers, total, r_ip=self.r_ip, r_port=self.r_port, r_user=self.r_user, r_pass=self.r_pass)
+                    resp, _, _ = helper_functions.resp_bytesize_resumable(self.url, self.url_redirect, size=total, r_ip=self.r_ip, r_port=self.r_port, r_user=self.r_user, r_pass=self.r_pass)
                 else:
                     #use existing response
                     pass
