@@ -79,7 +79,7 @@ class Download(object):
             downloaded = total
             for c in chunks:
                 downloaded += len(c)
-            percent = min(100 * downloaded / self.bytesize, 100)
+            percent = int(min(100. * downloaded / self.bytesize, 100))
             
             # record the download progress
             if self.track:
@@ -177,27 +177,27 @@ class Download(object):
         """Track the download progress
         
         """
-        # `status` is a number (percent)
-        if isinstance(status, float) or isinstance(status, int):
+        # `status` is an integer (percent)
+        if isinstance(status, int):
             with open(self.progress_file, 'w') as f:
-                f.write('{0}\n{1}\n{2}\n[COLOR forestgreen]{3:3d}%[/COLOR]  {4}'.format('script.remote_downloader', self.start_time, finish_time, int(status), self.basename))
+                f.write('{0}\n{1}\n{2}\n[COLOR forestgreen]{3:3d}%[/COLOR]  {4}'.format('script.remote_downloader', self.start_time, finish_time, status, self.basename))
                 
         # `status` is a failure message
         else:
             with open(self.progress_file, 'w') as f:
-                f.write('{0}\n{1}\n{2}\n[COLOR red]{3}[/COLOR]  {4}'.format('script.remote_downloader', self.start_time, finish_time, status, self.basename))
+                f.write('{0}\n{1}\n{2}\n[COLOR red]{3}[/COLOR]  {4}'.format('script.remote_downloader', self.start_time, finish_time, str(status), self.basename))
         
     def notification(self, status):
         """Show a notification of the download progress
         
         """
-        # `status` is a number (percent)
-        if isinstance(status, float) or isinstance(status, int):
-            msg_params = {'title': '{0}% - {1}'.format(int(status), self.basename), 'message': self.dest, 'displaytime': 10000}
+        # `status` is an integer (percent)
+        if isinstance(status, int):
+            msg_params = {'title': '{0}% - {1}'.format(status, self.basename), 'message': self.dest, 'displaytime': 10000}
             
         # `status` is a failure message
         else:
-            msg_params = {'title': status, 'message': self.dest, 'displaytime': 10000}
+            msg_params = {'title': str(status), 'message': self.dest, 'displaytime': 10000}
             
         # include the image in the notification, if there is one
         if self.image is not None:
