@@ -1,13 +1,19 @@
-import os
-import sys
-import time
+"""Define a class for downloading streams
+
+"""
+
 import xbmc
 import xbmcgui
 import xbmcvfs
 
+import os
+import sys
+import time
+
 from . import helper_functions
-from . import json_functions
+from . import jsonrpc_functions
 from . import name_functions
+from . import tracking
 
 
 class Download(object):
@@ -40,9 +46,7 @@ class Download(object):
             self.dialog_ok('ERROR: no download destination')
             sys.exit()
             
-        basename = os.path.basename(self.dest)
-        basename = basename.split('.')
-        self.basename = '.'.join(basename[:-1])
+        self.basename = os.path.basename(self.dest)
         
         # determine whether the file can be downloaded
         resp, _, resumable = helper_functions.resp_bytesize_resumable(self.url, self.url_redirect, r_ip=self.r_ip, r_port=self.r_port, r_user=self.r_user, r_pass=self.r_pass)
@@ -58,7 +62,7 @@ class Download(object):
         
         # the file where progress will be tracked
         if self.track:
-            self.progress_file = os.path.join(name_functions.get_tracking_folder(), 'TRACKER {0}.txt'.format(self.basename))
+            self.progress_file = os.path.join(tracking.get_tracking_folder(), 'TRACKER {0}.txt'.format(os.path.splitext(self.basename)[0]))
 
         # download-tracking variables
         total = 0
@@ -113,9 +117,9 @@ class Download(object):
 
                         # update the library
                         method = "VideoLibrary.Scan"
-                        update_downloading_library = json_functions.jsonrpc(method)
+                        update_downloading_library = jsonrpc_functions.jsonrpc(method)
                         if self.r_ip:
-                            update_requesting_library = json_functions.jsonrpc(method, None, None, self.r_ip, self.r_port, self.r_user, self.r_pass)
+                            update_requesting_library = jsonrpc_functions.jsonrpc(method, None, None, self.r_ip, self.r_port, self.r_user, self.r_pass)
 
                         self.done(True)
                         sys.exit()
@@ -204,15 +208,15 @@ class Download(object):
             msg_params['image'] = self.image
             
         # show a notification on this system
-        result = json_functions.jsonrpc("GUI.ShowNotification", msg_params)
+        result = jsonrpc_functions.jsonrpc("GUI.ShowNotification", msg_params)
 
         # send a notification to the Kodi that sent the download command
         if self.r_ip:
-            result = json_functions.jsonrpc("GUI.ShowNotification", msg_params, None, self.r_ip, self.r_port, self.r_user, self.r_pass)
+            result = jsonrpc_functions.jsonrpc("GUI.ShowNotification", msg_params, None, self.r_ip, self.r_port, self.r_user, self.r_pass)
     
     def dialog_ok(self, line, heading='Remote Downloader'):
         params = {'action': 'dialog_ok', 'line': line, 'heading': heading}
-        result = json_functions.jsonrpc('Addons.ExecuteAddon', params, 'script.remote_downloader', self.r_ip, self.r_port, self.r_user, self.r_pass)
+        result = jsonrpc_functions.jsonrpc('Addons.ExecuteAddon', params, 'script.remote_downloader', self.r_ip, self.r_port, self.r_user, self.r_pass)
             
     def done(self, success):
         """Show a success/failure message
@@ -241,5 +245,9 @@ class Download(object):
             xbmcgui.Window(10000).clearProperty('GEN-DOWNLOADED')
             
     def delete_tracker(self):
+        """Delete the tracker file
+        
+        """
         if self.progress_file is not None and xbmcvfs.exists(self.progress_file):
             xbmcvfs.delete(self.progress_file)
+

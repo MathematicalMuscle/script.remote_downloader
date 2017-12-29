@@ -6,24 +6,26 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
-import json
 import sys
 
 from . import helper_functions
-from . import json_functions
+from . import jsonrpc_functions
 
 
 def get_now_playing():
-    """Get info about the currently played file via JSON-RPC.
+    """Get info about the currently playing file via JSON-RPC.
 
     https://stackoverflow.com/a/38436735/8023447
 
     """
     params = {'playerid': 1, 'properties': ['file', 'showtitle', 'season', 'episode', 'thumbnail']}
-    return json_functions.jsonrpc('Player.GetItem', params)['item']
+    return jsonrpc_functions.jsonrpc('Player.GetItem', params)['item']
 
 
 def process_now_playing():
+    """Get info about the currently playing file, prompting the user if necessary
+    
+    """
     # pre-check: make sure a download path has been configured
     download_local = xbmcaddon.Addon('script.remote_downloader').getSetting('download_local')
     local_movies_folder = xbmcaddon.Addon('script.remote_downloader').getSetting('local_movies_folder')
@@ -133,3 +135,4 @@ def process_now_playing():
             sys.exit()
 
     return title, url, url_redirect, image, bytesize
+

@@ -26,23 +26,22 @@
 
 """
 
-import os
-import sys
 import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-import urlparse
+import os
+import sys
 
 from resources.lib import download
 from resources.lib import helper_functions
-from resources.lib import json_functions
+from resources.lib import jsonrpc_functions
 from resources.lib import menu
+from resources.lib import modify_addons
 from resources.lib import name_functions
 from resources.lib import now_playing
 from resources.lib import tracking
-from resources.lib.modify_addons import modify_addons
 
 
 # reset '0.0.0.0' IP addresses
@@ -89,7 +88,7 @@ if __name__ == "__main__":
         menu.menu()
         
     # get the `params`
-    params = json_functions.from_jsonrpc(', '.join(sys.argv[1:]))
+    params = jsonrpc_functions.from_jsonrpc(', '.join(sys.argv[1:]))
     action = params.get('action')
 
     # ================================================== #
@@ -101,14 +100,14 @@ if __name__ == "__main__":
         """Modify addons and exit
         
         """
-        modify_addons()
+        modify_addons.modify_addons()
         sys.exit()
         
     if action == 'modify_addons_silent':
         """Modify addons silently and exit
 
         """
-        modify_addons(msg_fmt='notification')
+        modify_addons.modify_addons(msg_fmt='notification')
         sys.exit()
 
     if action == 'update_addons':
@@ -122,14 +121,14 @@ if __name__ == "__main__":
         """Clean the video library and exit
 
         """
-        json_functions.jsonrpc('VideoLibrary.Clean')
+        jsonrpc_functions.jsonrpc('VideoLibrary.Clean')
         sys.exit()
 
     if action == 'library_scan':
         """Scan the video library and exit
 
         """
-        json_functions.jsonrpc('VideoLibrary.Scan')
+        jsonrpc_functions.jsonrpc('VideoLibrary.Scan')
         sys.exit()
 
     if action == 'restart_upnp':
@@ -145,9 +144,9 @@ if __name__ == "__main__":
             
             method = 'Settings.SetSettingValue'
             params = {'setting': 'services.upnpserver', 'value':False}
-            result = json_functions.jsonrpc(method, params, ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
+            result = jsonrpc_functions.jsonrpc(method, params, ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
             params = {'setting': 'services.upnpserver', 'value':True}
-            result = json_functions.jsonrpc(method, params, ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
+            result = jsonrpc_functions.jsonrpc(method, params, ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
             
         sys.exit()
     
@@ -192,7 +191,7 @@ if __name__ == "__main__":
         """Add or remove 'Restart remote UPnP server' from `autoexec.py`
         
         """
-        helper_functions.autoexec_add_remove(params.get('add_remove'))
+        autoexec_functions.autoexec_add_remove(params.get('add_remove'))
         sys.exit()
         
     if action == 'dialog_ok':
@@ -234,7 +233,7 @@ if __name__ == "__main__":
         # download the current video
         params = {'action': 'prepare_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize}
         method = 'Addons.ExecuteAddon'
-        result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
+        result = jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader')
         sys.exit()
 
     # ================================================== #
@@ -328,7 +327,7 @@ if __name__ == "__main__":
                   'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
                   'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
         
-        result = json_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
+        result = jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
         sys.exit()
 
     # ================================================== #
@@ -440,11 +439,11 @@ if __name__ == "__main__":
             params = {'action': 'confirm_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'basename': basename,
                       'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
                       'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
-            json_functions.jsonrpc(method, params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
+            jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
 
         else:
             params = {'action': 'confirm_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'basename': basename}
-            json_functions.jsonrpc(method, params, 'script.remote_downloader')
+            jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader')
 
         sys.exit()
 
@@ -559,9 +558,9 @@ if __name__ == "__main__":
         _params = {"labels": ["System.FriendlyName"]}
         _method = "XBMC.GetInfoLabels"
         if d_ip:
-            kodi_name = json_functions.jsonrpc(_method, _params, None, d_ip, d_port, d_user, d_pass)['System.FriendlyName']
+            kodi_name = jsonrpc_functions.jsonrpc(_method, _params, None, d_ip, d_port, d_user, d_pass)['System.FriendlyName']
         else:
-            kodi_name = json_functions.jsonrpc(_method, _params)['System.FriendlyName']
+            kodi_name = jsonrpc_functions.jsonrpc(_method, _params)['System.FriendlyName']
 
         # the size of the file to be created
         mbsize = bytesize / (1024 * 1024)
@@ -574,10 +573,10 @@ if __name__ == "__main__":
                 params = {'action': 'download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'track': track,
                           'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
                           'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
-                json_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
+                jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
             else:
                 params = {'action': 'download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'track': track}
-                json_functions.jsonrpc(method, params, 'script.remote_downloader')
+                jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader')
 
         sys.exit()
 
@@ -648,3 +647,4 @@ if __name__ == "__main__":
             
         d = download.Download(title, url, url_redirect, image, bytesize, r_ip, r_port, r_user, r_pass, track)
         d.download()
+

@@ -2,21 +2,24 @@
 
 """
 
-import sys
 import xbmc
 import xbmcaddon
 import xbmcgui
-import xbmcvfs
 
+import sys
+
+from . import autoexec_functions
 from . import helper_functions
-from . import json_functions
+from . import jsonrpc_functions
 from . import modify_addons
 from . import name_functions
 
 
 def menu():
-    autoexec_action = helper_functions.autoexec_status()
-    autoexec_opt = 'Remove \'Restart remote UPnP server\' from `autoexec.py`' if autoexec_action.startswith('delete') else 'Add \'Restart remote UPnP server\' to `autoexec.py`'
+    """Display a menu
+    
+    """
+    autoexec_opt = autoexec_functions.get_autoexec_opt()
     
     if xbmc.Player().isPlayingVideo():
         opts = ['Download current video']
@@ -43,13 +46,13 @@ def menu():
             # download the current video
             params = {'action': 'download_now_playing'}
             method = 'Addons.ExecuteAddon'
-            result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
+            result = jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader')
             sys.exit()
             
         elif selection == 'View download progress':
             params = {'action': 'get_downloads'}            
             method = 'Addons.ExecuteAddon'
-            result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
+            result = jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader')
             sys.exit()
         
         elif selection == 'Modify addons':
@@ -60,7 +63,7 @@ def menu():
             # restart the remote UPnP server                
             params = {'action': 'restart_upnp'}
             method = 'Addons.ExecuteAddon'
-            result = json_functions.jsonrpc(method, params, 'script.remote_downloader')
+            result = jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader')
             sys.exit()
             
         elif selection == 'Add a title regex substitution':
@@ -68,10 +71,7 @@ def menu():
             sys.exit()
         
         elif selection == autoexec_opt:
-            if autoexec_opt.startswith('Add'):
-                helper_functions.autoexec_add_remove(add_remove='add')
-            else:
-                helper_functions.autoexec_add_remove(add_remove='remove')
+            autoexec_functions.autoexec_add_remove(autoexec_opt)
             sys.exit()
             
         else:
@@ -86,20 +86,21 @@ def menu():
                 
             if selection == 'Clean remote video library':
                 # clean the remote video library
-                result = json_functions.jsonrpc(method='VideoLibrary.Clean', ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
+                result = jsonrpc_functions.jsonrpc(method='VideoLibrary.Clean', ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
                 sys.exit()
             
             elif selection == 'Update remote video library':
                 # scan the remote video library
-                result = json_functions.jsonrpc(method='VideoLibrary.Scan', ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
+                result = jsonrpc_functions.jsonrpc(method='VideoLibrary.Scan', ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
                 sys.exit()
             
             elif selection == 'Update remote addons':
                 # update addons on the remote system
                 method = 'Addons.ExecuteAddon'
                 params = {'action': 'update_addons'}
-                result = json_functions.jsonrpc(method, params, 'script.remote_downloader', ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
+                result = jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader', ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=5)
                 sys.exit()
     
     else:
         sys.exit()
+

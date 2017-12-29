@@ -1,25 +1,48 @@
+"""Functions relating to download tracking
+
+"""
+
+import xbmc
+import xbmcaddon
+import xbmcgui
+import xbmcvfs
+
 import glob
 import os
 import time
 
-import xbmc
-import xbmcgui
-import xbmcvfs
+from . import jsonrpc_functions
 
-from . import helper_functions
-from . import json_functions
-from . import name_functions
+
+def get_tracking_folder():
+    """Get the folder where downloads are tracked (and create it if necessary)
+    
+    """
+    tracking_folder = xbmcaddon.Addon('script.remote_downloader').getSetting('local_temp_folder')
+    if tracking_folder == '':
+        tracking_folder = xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/tracking/')
+    
+    if not xbmcvfs.exists(tracking_folder):
+        xbmcvfs.mkdirs(tracking_folder)
+    
+    return tracking_folder
 
 
 def get_downloads(d_ip, d_port, d_user, d_pass, r_ip, r_port, r_user, r_pass):
+    """Send a command to the downloading system to send the download progress string
+    
+    """
     params = {'action': 'get_local_downloads',
               'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
     method = 'Addons.ExecuteAddon'
-    result = json_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
+    result = jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
 
 
 def get_local_downloads(r_ip, r_port, r_user, r_pass):
-    tracking_folder = name_functions.get_tracking_folder()
+    """Send a string detailing the download progress on this system to the requesting system
+    
+    """
+    tracking_folder = get_tracking_folder()
     tracking_txts = sorted(glob.glob(os.path.join(tracking_folder, 'TRACKER *.txt')))
     
     active_downloads = []
@@ -41,10 +64,13 @@ def get_local_downloads(r_ip, r_port, r_user, r_pass):
         
     params = {'action': 'show_downloads', 'download_string': '\n'.join(active_downloads)}
     method = 'Addons.ExecuteAddon'
-    result = json_functions.jsonrpc(method, params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
+    result = jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
 
 
 def show_downloads(download_string):
+    """Show the string detailing the download progress
+    
+    """
     if download_string == '':
         xbmcgui.Dialog().ok('Remote Downloader', 'No active downloads')
     else:
@@ -52,7 +78,9 @@ def show_downloads(download_string):
 
 
 def get_uptime():
-    # get the time that the system has been running
+    """Get the time that the system has been running
+    
+    """
     uptime = 'Busy'
     while uptime == 'Busy':
         uptime = xbmc.getInfoLabel('System.UpTime')
@@ -65,4 +93,4 @@ def get_uptime():
     uptime = sum([float(uptime_list[i]) * float(uptime_list[i+1]) for i in range(0, len(uptime_list), 2)])
     
     return uptime + 60.
-    
+
