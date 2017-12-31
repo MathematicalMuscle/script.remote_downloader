@@ -48,6 +48,10 @@ msgctxt "#32007"
 msgid "Track downloads?"
 msgstr ""
 
+msgctxt "#32008"
+msgid "Remote Kodi max wait time (seconds):"
+msgstr ""
+
 msgctxt "#32010"
 msgid "Remote Kodi 1"
 msgstr ""

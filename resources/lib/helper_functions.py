@@ -108,7 +108,8 @@ def get_this_system():
         
     # get the IP address from the Kodi function
     ip = xbmc.getIPAddress()
-    if test_ip_address(ip, port, username, password):
+    timeout = int(xbmcaddon.Addon('script.remote_downloader').getSetting('max_wait_time'))
+    if test_ip_address(ip, port, username, password, timeout=timeout):
         return ip, port, username, password
         
     # failed to get IP address
@@ -124,6 +125,7 @@ def get_system_addresses():
         return None, None, None, None, None, None, None, None
     
     else:
+        timeout = int(xbmcaddon.Addon('script.remote_downloader').getSetting('max_wait_time'))
         r_ip, r_port, r_user, r_pass = None, None, None, None
         
         for i in range(5):
@@ -139,7 +141,7 @@ def get_system_addresses():
                     r_ip, r_port, r_user, r_pass = get_this_system()
                     
                 # check that the remote system is available
-                if test_ip_address(ip=d_ip, port=d_port, username=d_user, password=d_pass):
+                if test_ip_address(ip=d_ip, port=d_port, username=d_user, password=d_pass, timeout=timeout):
                     return d_ip, d_port, d_user, d_pass, r_ip, r_port, r_user, r_pass
 
         # no remote Kodi systems available ==> download it locally?

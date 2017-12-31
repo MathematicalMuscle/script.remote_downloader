@@ -9,6 +9,7 @@
     <setting label="32004" id="local_tv_folder" type="folder" source="videos"/>
     <setting label="32005" id="local_temp_folder" type="folder" source="auto" value=""/>
     <setting label="32006" id="local_ip_address" type="ipaddress"/>
+    <setting label="32008" id="max_wait_time" type="number" default="3"/>
   </category>
   <!-- Remote Kodi #1 -->
   <category label="32010">

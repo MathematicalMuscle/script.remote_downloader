@@ -43,7 +43,7 @@ def jsonrpc(method, params=None, addonid=None, ip=None, port=None, username=None
 
         # send the command
         try:
-            response = urllib2.urlopen(req, timeout=15)
+            response = urllib2.urlopen(req, timeout=timeout)
             response = response.read()
             response = json.loads(response)
 

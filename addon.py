@@ -34,6 +34,7 @@ import xbmcvfs
 import os
 import sys
 
+from resources.lib import autoexec_functions
 from resources.lib import download
 from resources.lib import helper_functions
 from resources.lib import jsonrpc_functions
@@ -191,7 +192,7 @@ if __name__ == "__main__":
         """Add or remove 'Restart remote UPnP server' from `autoexec.py`
         
         """
-        autoexec_functions.autoexec_add_remove(params.get('add_remove'))
+        autoexec_functions.autoexec_add_remove(params.get('autoexec_opt'))
         sys.exit()
         
     if action == 'dialog_ok':
