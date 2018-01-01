@@ -71,6 +71,7 @@ class Download(object):
         count = 0
         resume = 0
         sleep = 0
+        last_percent = -1
 
         f = xbmcvfs.File(self.temp_dest, 'w')
 
@@ -86,8 +87,10 @@ class Download(object):
             percent = int(min(100. * downloaded / self.bytesize, 100))
             
             # record the download progress
-            if self.track:
-                self.track_progress(percent)
+            if percent > last_percent:
+                last_percent = percent
+                if self.track:
+                    self.track_progress(percent)
                 
             # show a notification of the download progress
             if percent >= notify:
