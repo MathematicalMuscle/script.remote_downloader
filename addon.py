@@ -33,6 +33,7 @@ import xbmcvfs
 
 import os
 import sys
+import urllib
 
 from resources.lib import autoexec_functions
 from resources.lib import download
@@ -202,6 +203,40 @@ if __name__ == "__main__":
         heading = params.get('heading')
         line = params.get('line')
         xbmcgui.Dialog().ok(heading, line)
+        
+    if action == 'save_jsonrpc_url':
+        """Save a 'prepare_download' URL that can be used to initiate a download
+        
+        """
+        title = name_functions.get_title(params.get('title'))
+        url = params.get('url')
+        url_redirect = params.get('url_redirect')
+        image = params.get('image')
+        bytesize = params.get('bytesize')
+        basename = params.get('basename')
+        
+        _params = {'action': 'prepare_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize}
+        
+        links_dir = xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/Links/')
+        if not xbmcvfs.exists(links_dir):
+            xbmcvfs.mkdirs(links_dir)
+            
+        outfile = links_dir + '/' + os.path.splitext(basename)[0] + '.txt'
+        if xbmcvfs.exists(outfile):
+            i = 2
+            while True:
+                if not xbmcvfs.exists(outfile[:-4] + ' ({0}).txt'.format(i)):
+                    outfile = outfile[:-4] + ' ({0}).txt'.format(i)
+                    break
+                else:
+                    i += 1
+        
+        port = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverport"}}'))['result']['value']
+        with open(outfile, 'w') as f:
+            f.write('http://localhost:' + str(port) + '/jsonrpc?request={"jsonrpc":"2.0","id":1,"method":"Addons.ExecuteAddon","params":{"addonid":"script.remote_downloader","params":"' + urllib.quote_plus(str(_params)) + '"}}')
+
+        sys.exit()
+        
 
     # ================================================== #
     #                                                    #
@@ -578,6 +613,22 @@ if __name__ == "__main__":
             else:
                 params = {'action': 'download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'track': track}
                 jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader')
+
+            # for saving the JSON-RPC URL
+            _params = {'action': 'save_jsonrpc_url', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'basename': basename}
+            
+            # save the JSON-RPC URL to this system?
+            if xbmcaddon.Addon('script.remote_downloader').getSetting('save_jsonrpc_url') == 'true':
+                jsonrpc_functions.jsonrpc('Addons.ExecuteAddon', _params, 'script.remote_downloader')
+                    
+            # save the JSON-RPC URL to remote systems?
+            for i in range(5):
+                if xbmcaddon.Addon('script.remote_downloader').getSetting('save_jsonrpc_url{0}'.format(i)) == 'true':
+                    ip_address = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_ip_address{0}'.format(i))            
+                    port = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_port{0}'.format(i+1))
+                    username = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_username{0}'.format(i+1))
+                    password = xbmcaddon.Addon('script.remote_downloader').getSetting('remote_password{0}'.format(i+1))
+                    jsonrpc_functions.jsonrpc('Addons.ExecuteAddon', _params, 'script.remote_downloader', ip_address, port, username, password)
 
         sys.exit()
 

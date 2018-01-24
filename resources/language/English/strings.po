@@ -52,6 +52,10 @@ msgctxt "#32008"
 msgid "Remote Kodi max wait time (seconds):"
 msgstr ""
 
+msgctxt "#32009"
+msgid "Save JSON-RPC URL here?"
+msgstr ""
+
 msgctxt "#32010"
 msgid "Remote Kodi 1"
 msgstr ""
