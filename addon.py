@@ -464,7 +464,7 @@ if __name__ == "__main__":
 
         # get the name of the file to be created
         dest, _ = name_functions.get_dest(title, url)
-        if isinstance(dest, str):
+        if isinstance(dest, (str, unicode)):
             # `dest` is a string --> get the basename
             basename = os.path.basename(dest)
         else:
