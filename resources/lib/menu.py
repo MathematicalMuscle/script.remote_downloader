@@ -9,7 +9,6 @@ import xbmcgui
 import sys
 
 from . import autoexec_functions
-from . import helper_functions
 from . import jsonrpc_functions
 from . import modify_addons
 from . import name_functions

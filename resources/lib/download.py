@@ -10,18 +10,19 @@ import os
 import sys
 import time
 
-from . import helper_functions
 from . import jsonrpc_functions
 from . import name_functions
+from . import network_functions
 from . import tracking
 
 
 class Download(object):
-    def __init__(self, title, url, url_redirect, image, bytesize, r_ip, r_port, r_user, r_pass, track):
+    def __init__(self, title, url, url_redirect, image, bytesize, headers, r_ip, r_port, r_user, r_pass, track):
         self.title = title
         self.url = url
         self.url_redirect = url_redirect
         self.bytesize = bytesize
+        self.headers = headers
         self.image = image
         self.r_ip = r_ip
         self.r_port = r_port
@@ -49,7 +50,7 @@ class Download(object):
         self.basename = os.path.basename(self.dest)
         
         # determine whether the file can be downloaded
-        resp, _, resumable = helper_functions.resp_bytesize_resumable(self.url, self.url_redirect, r_ip=self.r_ip, r_port=self.r_port, r_user=self.r_user, r_pass=self.r_pass)
+        resp, _, _, resumable = network_functions.open(self.url, self.url_redirect, headers=self.headers, r_ip=self.r_ip, r_port=self.r_port, r_user=self.r_user, r_pass=self.r_pass)
 
         if resp is None:
             sys.exit()
@@ -175,7 +176,7 @@ class Download(object):
                     chunks  = []
                     #create new response
                     xbmc.log('script.remote_downloader: Download resumed ({0}) {1}'.format(resume, self.dest))
-                    resp, _, _ = helper_functions.resp_bytesize_resumable(self.url, self.url_redirect, size=total, r_ip=self.r_ip, r_port=self.r_port, r_user=self.r_user, r_pass=self.r_pass)
+                    resp, _, _, _ = network_functions.open(self.url, self.url_redirect, size=total, headers=self.headers, r_ip=self.r_ip, r_port=self.r_port, r_user=self.r_user, r_pass=self.r_pass)
                 else:
                     #use existing response
                     pass

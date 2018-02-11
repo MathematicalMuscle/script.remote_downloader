@@ -8,8 +8,8 @@ import xbmcgui
 
 import sys
 
-from . import helper_functions
 from . import jsonrpc_functions
+from . import network_functions
 
 
 def get_now_playing():
@@ -48,7 +48,7 @@ def process_now_playing():
         sys.exit()
 
     # determine whether the file can be downloaded
-    resp, bytesize, _ = helper_functions.resp_bytesize_resumable(url)
+    resp, bytesize, headers, _ = network_functions.open(url)
     if bytesize is None:
         sys.exit()
     url_redirect = resp.geturl()
@@ -134,5 +134,5 @@ def process_now_playing():
         else:
             sys.exit()
 
-    return title, url, url_redirect, image, bytesize
+    return title, url, url_redirect, image, bytesize, headers
 

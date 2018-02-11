@@ -7,12 +7,50 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
+import functools
+import httplib
 import socket
 import sys
 import urllib2
 import urlparse
 
 from . import jsonrpc_functions
+
+
+class BoundHTTPHandler(urllib2.HTTPHandler):
+    """https://stackoverflow.com/a/14669175
+    
+    """
+    def __init__(self, source_address=None, debuglevel=0):
+        urllib2.HTTPHandler.__init__(self, debuglevel)
+        self.http_class = functools.partial(httplib.HTTPConnection, source_address=source_address)
+
+    def http_open(self, req):
+        return self.do_open(self.http_class, req)
+
+
+class BoundHTTPSHandler(urllib2.HTTPSHandler):
+    """https://stackoverflow.com/a/14669175
+    
+    """
+    def __init__(self, source_address=None, debuglevel=0):
+        urllib2.HTTPSHandler.__init__(self, debuglevel)
+        self.https_class = functools.partial(httplib.HTTPSConnection, source_address=source_address)
+
+    def https_open(self, req):
+        return self.do_open(self.https_class, req)
+
+
+def get_opener(url0, r_ip):
+    """Return an HTTP/HTTPS opener
+    
+    """
+    if url0.startswith('https'):
+        handler = BoundHTTPSHandler(source_address=(r_ip, 0))
+    else:
+        handler = BoundHTTPSHandler(source_address=(r_ip, 0))
+    
+    return urllib2.build_opener(handler)
 
 
 def get_url0(url):
@@ -29,39 +67,51 @@ def get_headers(url):
     try:
         headers = dict(urlparse.parse_qsl(url.rsplit('|', 1)[1]))
     except:
-        headers = dict('')
+        headers = dict()
     return headers
 
 
-def resp_bytesize_resumable(url, url_redirect=None, size=0, r_ip=None, r_port=None, r_user=None, r_pass=None):
+def open(url, url_redirect=None, headers=None, size=0, r_ip=None, r_port=None, r_user=None, r_pass=None):
     """Open the URL and get info about the file size and whether the download is resumable
     
     """
-    try:
-        headers = get_headers(url)
-        if size > 0:
-            size = int(size)
-            headers['Range'] = 'bytes={0}-'.format(size)
+    original_headers = headers
 
-        url0 = get_url0(url)
-        req = urllib2.Request(url0, headers=headers)
-        resp = urllib2.urlopen(req, timeout=30)
-
-    except:
-        try:
-            headers = get_headers(url_redirect)
-            if size > 0:
-                size = int(size)
-                headers['Range'] = 'bytes={0}-'.format(size)
-
-            url0 = get_url0(url_redirect)
-            req = urllib2.Request(url0, headers=headers)
-            resp = urllib2.urlopen(req, timeout=30)
-            
-        except:
+    for i, u in enumerate([url, url, url_redirect, url_redirect, None]):
+        # Error: no response from server
+        if u is None:
             params = {'action': 'dialog_ok', 'line': 'Error: no response from server', 'heading': 'Remote Downloader'}
             result = jsonrpc_functions.jsonrpc('Addons.ExecuteAddon', params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
-            return None, None, None
+            return None, None, None, None
+            
+        if i % 2 == 1 and r_ip is None:
+            continue
+
+        # get the portion of the URL before the first "|"
+        url0 = get_url0(u)
+        
+        # get the headers if they were not provided as an input
+        if original_headers is None:
+            headers = get_headers(u)
+
+        # the first byte to start at
+        if size > 0:
+            headers['Range'] = 'bytes={0}-'.format(int(size))
+            
+        try:
+            xbmc.log('{0}) BEFORE:  '.format(i+1) + str(headers), xbmc.LOGNOTICE)
+            req = urllib2.Request(url0, headers=headers)
+            headers = dict(req.header_items())
+            xbmc.log('{0}) AFTER Request:  '.format(i+1) + str(headers), xbmc.LOGNOTICE)
+            if i % 2 == 0:
+                resp = urllib2.urlopen(req, timeout=30)
+            else:
+                resp = get_opener(url0, r_ip).open(req, timeout=30)
+            headers = dict(resp.headers)
+            xbmc.log('{0}) AFTER urlopen:  '.format(i+1) + str(headers), xbmc.LOGNOTICE)
+            break
+        except:
+            pass
 
     try:
         bytesize = int(resp.headers['Content-Length'])
@@ -75,7 +125,7 @@ def resp_bytesize_resumable(url, url_redirect=None, size=0, r_ip=None, r_port=No
     except:
         resumable = False
 
-    return resp, bytesize, resumable
+    return resp, bytesize, headers, resumable
 
 
 def test_ip_address(ip, port, username, password, timeout=5):

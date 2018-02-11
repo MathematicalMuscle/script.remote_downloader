@@ -11,7 +11,7 @@ import os
 import re
 import urlparse
 
-from . import helper_functions
+from . import network_functions
 
 
 def add_substitution(old=None, new=None):
@@ -107,7 +107,7 @@ def get_dest(title, url, look_for_duplicates=True):
         dest = os.path.join(dest, 'Season {0:01d}'.format(int(season_number[0][1])))
 
     # add the extension
-    url0 = helper_functions.get_url0(url)
+    url0 = network_functions.get_url0(url)
     ext = os.path.splitext(urlparse.urlparse(url0).path)[1][1:]
     if ext not in ['mp4', 'mkv', 'flv', 'avi', 'mpg']:
         ext = 'mp4'
