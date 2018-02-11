@@ -107,8 +107,8 @@ def open(url, url_redirect=None, headers=None, size=0, r_ip=None, r_port=None, r
                 resp = urllib2.urlopen(req, timeout=30)
             else:
                 resp = get_opener(url0, r_ip).open(req, timeout=30)
-            headers = dict(resp.headers)
-            xbmc.log('{0}) AFTER urlopen:  '.format(i+1) + str(headers), xbmc.LOGNOTICE)
+            #headers = dict(resp.headers)
+            #xbmc.log('{0}) AFTER urlopen:  '.format(i+1) + str(headers), xbmc.LOGNOTICE)
             break
         except:
             pass
