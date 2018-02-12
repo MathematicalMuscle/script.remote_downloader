@@ -48,7 +48,7 @@ def process_now_playing():
         sys.exit()
 
     # determine whether the file can be downloaded
-    resp, bytesize, headers, _ = network_functions.open(url)
+    resp, bytesize, headers, cookie, _ = network_functions.open(url)
     if bytesize is None:
         sys.exit()
     url_redirect = resp.geturl()
@@ -134,5 +134,5 @@ def process_now_playing():
         else:
             sys.exit()
 
-    return title, url, url_redirect, image, bytesize, headers
+    return title, url, url_redirect, image, bytesize, headers, cookie
 

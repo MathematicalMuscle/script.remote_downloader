@@ -214,9 +214,11 @@ if __name__ == "__main__":
         image = params.get('image')
         bytesize = params.get('bytesize')
         headers = params.get('headers')
+        cookie = params.get('cookie')
         basename = params.get('basename')
         
-        _params = {'action': 'prepare_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'headers': headers}
+        _params = {'action': 'prepare_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image,
+                   'bytesize': bytesize, 'headers': headers, 'cookie': cookie}
         
         links_dir = xbmc.translatePath('special://userdata/addon_data/script.remote_downloader/Links')
         if not xbmcvfs.exists(links_dir):
@@ -264,13 +266,16 @@ if __name__ == "__main__":
         bytesize : int
             file size of the download in bytes
         headers : dict
-            the headers for the URL
+            the headers from the `Request` object
+        cookie : str, None
+            the cookie from the `urlopen` response
 
         """
-        title, url, url_redirect, image, bytesize, headers = now_playing.process_now_playing()
+        title, url, url_redirect, image, bytesize, headers, cookie = now_playing.process_now_playing()
 
         # download the current video
-        params = {'action': 'prepare_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'headers': headers}
+        params = {'action': 'prepare_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image,
+                  'bytesize': bytesize, 'headers': headers, 'cookie': cookie}
         method = 'Addons.ExecuteAddon'
         result = jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader')
         sys.exit()
@@ -300,7 +305,9 @@ if __name__ == "__main__":
         bytesize : int
             file size of the download in bytes (if downloading the "now playing" stream)
         headers : dict
-            the headers for the URL
+            the headers from the `Request` object
+        cookie : str, None
+            the cookie from the `urlopen` response
 
         Returns
         -------
@@ -317,7 +324,9 @@ if __name__ == "__main__":
         bytesize : int
             file size of the download in bytes
         headers : dict
-            the headers for the URL
+            the headers from the `Request` object
+        cookie : str, None
+            the cookie from the `urlopen` response
         d_ip : str
             downloading system IP address (if downloading remotely)
         d_port : str
@@ -342,6 +351,7 @@ if __name__ == "__main__":
         image = params.get('image')
         bytesize = params.get('bytesize')
         headers = params.get('headers')
+        cookie = params.get('cookie')
 
         # if there is no url, exit
         if url is None:
@@ -350,7 +360,7 @@ if __name__ == "__main__":
 
         # determine whether the file can be downloaded
         if bytesize is None:
-            resp, bytesize, headers, _ = network_functions.open(url, url_redirect)
+            resp, bytesize, headers, cookie, _ = network_functions.open(url, url_redirect)
             if bytesize is None:
                 sys.exit()
             url_redirect = resp.geturl()
@@ -367,7 +377,8 @@ if __name__ == "__main__":
         
         # send a download request to the downloading system
         method = 'Addons.ExecuteAddon'
-        params = {'action': 'request_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'headers': headers,
+        params = {'action': 'request_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image,
+                  'bytesize': bytesize, 'headers': headers, 'cookie': cookie,
                   'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
                   'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
         
@@ -399,7 +410,9 @@ if __name__ == "__main__":
         bytesize : int
             file size of the download in bytes
         headers : dict
-            the headers for the URL
+            the headers from the `Request` object
+        cookie : str, None
+            the cookie from the `urlopen` response
         d_ip : str
             downloading system IP address (if downloading remotely)
         d_port : str
@@ -432,7 +445,9 @@ if __name__ == "__main__":
         bytesize : int
             file size of the download in bytes
         headers : dict
-            the headers for the URL
+            the headers from the `Request` object
+        cookie : str, None
+            the cookie from the `urlopen` response
         basename : str
             the name of the file to be created
         d_ip : str
@@ -459,6 +474,7 @@ if __name__ == "__main__":
         image = params.get('image')
         bytesize = params.get('bytesize')
         headers = params.get('headers')
+        cookie = params.get('cookie')
 
         # info about the downloading Kodi system
         d_ip = params.get('d_ip')
@@ -485,13 +501,15 @@ if __name__ == "__main__":
             basename = dest
 
         if d_ip:
-            params = {'action': 'confirm_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'headers': headers, 'basename': basename,
+            params = {'action': 'confirm_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image,
+                      'bytesize': bytesize, 'headers': headers, 'cookie': cookie, 'basename': basename,
                       'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
                       'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
             jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
 
         else:
-            params = {'action': 'confirm_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'headers': headers, 'basename': basename}
+            params = {'action': 'confirm_download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image,
+                      'bytesize': bytesize, 'headers': headers, 'cookie': cookie, 'basename': basename}
             jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader')
 
         sys.exit()
@@ -521,7 +539,9 @@ if __name__ == "__main__":
         bytesize : int
             file size of the download in bytes
         headers : dict
-            the headers for the URL
+            the headers from the `Request` object
+        cookie : str, None
+            the cookie from the `urlopen` response
         basename : str
             the name of the file to be created
         d_ip : str
@@ -556,7 +576,9 @@ if __name__ == "__main__":
         bytesize : int
             file size of the download in bytes
         headers : dict
-            the headers for the URL
+            the headers from the `Request` object
+        cookie : str, None
+            the cookie from the `urlopen` response
         d_ip : str
             downloading system IP address (if downloading remotely)
         d_port : str
@@ -583,6 +605,7 @@ if __name__ == "__main__":
         image = params.get('image')
         bytesize = params.get('bytesize')
         headers = params.get('headers')
+        cookie = params.get('cookie')
         basename = params.get('basename')
 
         # info about the downloading Kodi system
@@ -624,15 +647,18 @@ if __name__ == "__main__":
             method = 'Addons.ExecuteAddon'
 
             if d_ip:
-                params = {'action': 'download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'headers': headers, 'track': track,
+                params = {'action': 'download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image,
+                          'bytesize': bytesize, 'headers': headers, 'cookie': cookie, 'track': track,
                           'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
                 jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader', d_ip, d_port, d_user, d_pass)
             else:
-                params = {'action': 'download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'headers': headers, 'track': track}
+                params = {'action': 'download', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image,
+                          'bytesize': bytesize, 'headers': headers, 'cookie': cookie, 'track': track}
                 jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader')
 
             # for saving the JSON-RPC URL
-            _params = {'action': 'save_jsonrpc_url', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image, 'bytesize': bytesize, 'headers': headers, 'basename': basename}
+            _params = {'action': 'save_jsonrpc_url', 'title': title, 'url': url, 'url_redirect': url_redirect, 'image': image,
+                       'bytesize': bytesize, 'headers': headers, 'cookie': cookie, 'basename': basename}
             
             # save the JSON-RPC URL to this system?
             if xbmcaddon.Addon('script.remote_downloader').getSetting('save_jsonrpc_url') == 'true':
@@ -674,7 +700,9 @@ if __name__ == "__main__":
         bytesize : int
             file size of the download in bytes
         headers : dict
-            the headers for the URL
+            the headers from the `Request` object
+        cookie : str, None
+            the cookie from the `urlopen` response
         r_ip : str
             requesting system IP address (if downloading remotely)
         r_port : str
@@ -693,6 +721,7 @@ if __name__ == "__main__":
         image = params.get('image')
         bytesize = params.get('bytesize')
         headers = params.get('headers')
+        cookie = params.get('cookie')
 
         # info about the requesting Kodi system
         r_ip = params.get('r_ip')
@@ -703,6 +732,6 @@ if __name__ == "__main__":
         # track the download progress?
         track = params.get('track')
             
-        d = download.Download(title, url, url_redirect, image, bytesize, headers, r_ip, r_port, r_user, r_pass, track)
+        d = download.Download(title, url, url_redirect, image, bytesize, headers, cookie, r_ip, r_port, r_user, r_pass, track)
         d.download()
 

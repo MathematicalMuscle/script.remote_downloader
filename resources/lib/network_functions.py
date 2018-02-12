@@ -71,55 +71,61 @@ def get_headers(url):
     return headers
 
 
-def open(url, url_redirect=None, headers=None, size=0, r_ip=None, r_port=None, r_user=None, r_pass=None):
+def open(url, url_redirect=None, headers=None, cookie=None, size=0, r_ip=None, r_port=None, r_user=None, r_pass=None):
     """Open the URL and get info about the file size and whether the download is resumable
     
     """
     original_headers = headers
 
-    for i, u in enumerate([url, url, url, url_redirect, url_redirect, url_redirect, None]):
-        # i % 3 == 0:  get the headers from the url
-        # i % 3 == 1:  use the provided headers
-        # i % 3 == 2:  use the provided headers and the opener with the `source_address` argument
+    for i, u in enumerate([url, url, url, url, url, url_redirect, url_redirect, url_redirect, url_redirect, url_redirect, None]):
+        # i % 5 == 0:  get the headers from the url
+        # i % 5 == 1:  use the provided headers
+        # i % 5 == 2:  use the provided headers + cookie
+        # i % 5 == 3:  use the provided headers and the opener with the `source_address` argument
+        # i % 5 == 4:  use the provided headers + cookie and the opener with the `source_address` argument
         # Error: no response from server
         if u is None:
             params = {'action': 'dialog_ok', 'line': 'Error: no response from server', 'heading': 'Remote Downloader'}
             result = jsonrpc_functions.jsonrpc('Addons.ExecuteAddon', params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
-            return None, None, None, None
+            return None, None, None, None, None
             
-        if i % 3 == 2 and r_ip is None:
+        if i % 5 > 2 and r_ip is None:
             continue
 
         # get the portion of the URL before the first "|"
         url0 = get_url0(u)
+        xbmc.log('{0}) '.format(i+1) + u, xbmc.LOGNOTICE)
         
         # get the headers if they were not provided as an input
-        if i % 3 == 0 or original_headers is None:
+        if i % 5 == 0 or original_headers is None:
             headers = get_headers(u)
         else:
             headers = original_headers
+        
+        # use the provided cookie
+        if cookie is not None and (headers % 5 == 2 or headers % 5 == 4):
+            headers['Cookie'] = cookie
 
         # the first byte to start at
         if size > 0:
             headers['Range'] = 'bytes={0}-'.format(int(size))
             
         try:
-            xbmc.log('{0}) BEFORE:  '.format(i+1) + str(headers), xbmc.LOGNOTICE)
             req = urllib2.Request(url0, headers=headers)
-            #headers = dict(req.header_items())
-            xbmc.log('{0}) AFTER Request:  '.format(i+1) + str(dict(req.header_items())), xbmc.LOGNOTICE)
-            if i % 3 < 2:
+            if i % 5 < 3:
                 resp = urllib2.urlopen(req, timeout=30)
             else:
                 resp = get_opener(url0, r_ip).open(req, timeout=30)
                 
-            cookie = resp.headers.get('Set-Cookie')
-            if cookie is not None:
-                headers['Cookie'] = cookie
-
-            #headers = dict(resp.headers)
-            xbmc.log('{0}) AFTER urlopen:  '.format(i+1) + str(dict(resp.headers)), xbmc.LOGNOTICE)
             headers = dict(req.header_items())
+            cookie = resp.headers.get('Set-Cookie')
+
+            xbmc.log('{0}) '.format(i+1) + u, xbmc.LOGNOTICE)
+            xbmc.log('{0}) BEFORE headers:     '.format(i+1) + str(headers), xbmc.LOGNOTICE)
+            xbmc.log('{0}) `Request` headers:  '.format(i+1) + str(dict(req.header_items())), xbmc.LOGNOTICE)
+            xbmc.log('{0}) `urlopen` headers:  '.format(i+1) + str(dict(resp.headers)), xbmc.LOGNOTICE)
+            xbmc.log('{0}) RETURNED headers:   '.format(i+1) + str(headers), xbmc.LOGNOTICE)
+            xbmc.log('{0}) RETURNED cookie:    '.format(i+1) + str(cookie), xbmc.LOGNOTICE)
             break
         except:
             pass
@@ -129,14 +135,14 @@ def open(url, url_redirect=None, headers=None, size=0, r_ip=None, r_port=None, r
     except:
         params = {'action': 'dialog_ok', 'line': 'Error: unknown filesize', 'heading': 'Remote Downloader'}
         result = jsonrpc_functions.jsonrpc('Addons.ExecuteAddon', params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
-        return None, None, None
+        return None, None, None, None, None
 
     try:
         resumable = 'bytes' in resp.headers['Accept-Ranges'].lower()
     except:
         resumable = False
 
-    return resp, bytesize, headers, resumable
+    return resp, bytesize, headers, cookie, resumable
 
 
 def test_ip_address(ip, port, username, password, timeout=5):
