@@ -103,7 +103,7 @@ def open(url, url_redirect=None, headers=None, cookie=None, size=0, r_ip=None, r
             headers = original_headers
         
         # use the provided cookie
-        if cookie is not None and (headers % 5 == 2 or headers % 5 == 4):
+        if cookie is not None and (i % 5 == 2 or i % 5 == 4):
             headers['Cookie'] = cookie
 
         # the first byte to start at
