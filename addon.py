@@ -239,6 +239,11 @@ if __name__ == "__main__":
             f.write('http://localhost:' + str(port) + '/jsonrpc?request={"jsonrpc":"2.0","id":1,"method":"Addons.ExecuteAddon","params":{"addonid":"script.remote_downloader","params":"' + urllib.quote_plus(str(_params)) + '"}}')
 
         sys.exit()
+    
+    if action == 'log':
+        log_str = params.get('log_str')
+        log_level = eval('xbmc.LOG{0}'.format(xbmcaddon.Addon('script.remote_downloader').getSetting('log_level')))
+        xbmc.log(log_str, log_level)
         
 
     # ================================================== #

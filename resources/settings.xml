@@ -2,54 +2,57 @@
 <settings>
   <category label="32000">
     <!-- Local Kodi -->
-    <setting label="32001" id="download_local" type="select" values="Yes|No|If remote unavailable" default="No"/>
-    <setting label="32007" id="track_downloads" type="bool" default="true"/>
-    <setting label="32002" id="local_movies_folder" type="folder" source="videos"/>
-    <setting label="32003" id="local_movies_own_folder" type="bool" default="false"/>
-    <setting label="32004" id="local_tv_folder" type="folder" source="videos"/>
-    <setting label="32005" id="local_temp_folder" type="folder" source="auto" value=""/>
-    <setting label="32006" id="local_ip_address" type="ipaddress"/>
-    <setting label="32008" id="max_wait_time" type="number" default="3"/>
-    <setting label="32009" id="save_jsonrpc_url" type="bool" default="false"/>
+    <setting label="32001" type="lsep"/>
+    <setting label="32002" id="download_local" type="select" values="Yes|No|If remote unavailable" default="No"/>
+    <setting label="32003" id="track_downloads" type="bool" default="true"/>
+    <setting label="32004" id="local_movies_folder" type="folder" source="videos"/>
+    <setting label="32005" id="local_movies_own_folder" type="bool" default="false"/>
+    <setting label="32006" id="local_tv_folder" type="folder" source="videos"/>
+    <setting label="32007" id="local_temp_folder" type="folder" source="auto" value=""/>
+    <setting label="32008" type="lsep"/>
+    <setting label="32009" id="local_ip_address" type="ipaddress"/>
+    <setting label="32010" id="max_wait_time" type="number" default="3"/>
+    <setting label="32011" id="save_jsonrpc_url" type="bool" default="false"/>
+    <setting label="32012" id="log_level" type="select" values="DEBUG|INFO|NOTICE" default="DEBUG"/>
   </category>
   <!-- Remote Kodi #1 -->
-  <category label="32010">
-    <setting label="32011" id="remote_ip_address1" type="ipaddress"/>
-    <setting label="32012" id="remote_username1" type="text" default="kodi"/>
-    <setting label="32013" id="remote_password1" type="text" default=""/>
-    <setting label="32014" id="remote_port1" type="number" default="8080"/>
-    <setting label="32009" id="save_jsonrpc_url1" type="bool" default="false"/>
+  <category label="32100">
+    <setting label="32101" id="remote_ip_address1" type="ipaddress"/>
+    <setting label="32102" id="remote_username1" type="text" default="kodi"/>
+    <setting label="32103" id="remote_password1" type="text" default=""/>
+    <setting label="32104" id="remote_port1" type="number" default="8080"/>
+    <setting label="32011" id="save_jsonrpc_url1" type="bool" default="false"/>
   </category>
   <!-- Remote Kodi #2 -->
-  <category label="32020">
-    <setting label="32011" id="remote_ip_address2" type="ipaddress"/>
-    <setting label="32012" id="remote_username2" type="text" default="kodi"/>
-    <setting label="32013" id="remote_password2" type="text" default=""/>
-    <setting label="32014" id="remote_port2" type="number" default="8080"/>
-    <setting label="32009" id="save_jsonrpc_url2" type="bool" default="false"/>
+  <category label="32200">
+    <setting label="32101" id="remote_ip_address2" type="ipaddress"/>
+    <setting label="32102" id="remote_username2" type="text" default="kodi"/>
+    <setting label="32103" id="remote_password2" type="text" default=""/>
+    <setting label="32104" id="remote_port2" type="number" default="8080"/>
+    <setting label="32011" id="save_jsonrpc_url2" type="bool" default="false"/>
   </category>
   <!-- Remote Kodi #3 -->
-  <category label="32030">
-    <setting label="32011" id="remote_ip_address3" type="ipaddress"/>
-    <setting label="32012" id="remote_username3" type="text" default="kodi"/>
-    <setting label="32013" id="remote_password3" type="text" default=""/>
-    <setting label="32014" id="remote_port3" type="number" default="8080"/>
-    <setting label="32009" id="save_jsonrpc_url3" type="bool" default="false"/>
+  <category label="32300">
+    <setting label="32101" id="remote_ip_address3" type="ipaddress"/>
+    <setting label="32102" id="remote_username3" type="text" default="kodi"/>
+    <setting label="32103" id="remote_password3" type="text" default=""/>
+    <setting label="32104" id="remote_port3" type="number" default="8080"/>
+    <setting label="32011" id="save_jsonrpc_url3" type="bool" default="false"/>
   </category>
   <!-- Remote Kodi #4 -->
-  <category label="32040">
-    <setting label="32011" id="remote_ip_address4" type="ipaddress"/>
-    <setting label="32012" id="remote_username4" type="text" default="kodi"/>
-    <setting label="32013" id="remote_password4" type="text" default=""/>
-    <setting label="32014" id="remote_port4" type="number" default="8080"/>
-    <setting label="32009" id="save_jsonrpc_url4" type="bool" default="false"/>
+  <category label="32400">
+    <setting label="32101" id="remote_ip_address4" type="ipaddress"/>
+    <setting label="32102" id="remote_username4" type="text" default="kodi"/>
+    <setting label="32103" id="remote_password4" type="text" default=""/>
+    <setting label="32104" id="remote_port4" type="number" default="8080"/>
+    <setting label="32011" id="save_jsonrpc_url4" type="bool" default="false"/>
   </category>
   <!-- Remote Kodi #5 -->
-  <category label="32050">
-    <setting label="32011" id="remote_ip_address5" type="ipaddress"/>
-    <setting label="32012" id="remote_username5" type="text" default="kodi"/>
-    <setting label="32013" id="remote_password5" type="text" default=""/>
-    <setting label="32014" id="remote_port5" type="number" default="8080"/>
-    <setting label="32009" id="save_jsonrpc_url5" type="bool" default="false"/>
+  <category label="32500">
+    <setting label="32101" id="remote_ip_address5" type="ipaddress"/>
+    <setting label="32102" id="remote_username5" type="text" default="kodi"/>
+    <setting label="32103" id="remote_password5" type="text" default=""/>
+    <setting label="32104" id="remote_port5" type="number" default="8080"/>
+    <setting label="32011" id="save_jsonrpc_url5" type="bool" default="false"/>
   </category>
 </settings>

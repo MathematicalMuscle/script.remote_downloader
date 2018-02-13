@@ -21,73 +21,85 @@ msgid "This Kodi"
 msgstr ""
 
 msgctxt "#32001"
-msgid "Download to this device?"
+msgid "Download Settings"
 msgstr ""
 
 msgctxt "#32002"
-msgid "Local movies download folder:"
+msgid "Download to this device?"
 msgstr ""
 
 msgctxt "#32003"
-msgid "Download each movie into its own folder?"
-msgstr ""
-
-msgctxt "#32004"
-msgid "Local TV download folder:"
-msgstr ""
-
-msgctxt "#32005"
-msgid "Local temp download folder:"
-msgstr ""
-
-msgctxt "#32006"
-msgid "Local IP address (optional):"
-msgstr ""
-
-msgctxt "#32007"
 msgid "Track downloads?"
 msgstr ""
 
+msgctxt "#32004"
+msgid "Local movies download folder:"
+msgstr ""
+
+msgctxt "#32005"
+msgid "Download each movie into its own folder?"
+msgstr ""
+
+msgctxt "#32006"
+msgid "Local TV download folder:"
+msgstr ""
+
+msgctxt "#32007"
+msgid "Local temp download folder:"
+msgstr ""
+
 msgctxt "#32008"
-msgid "Remote Kodi max wait time (seconds):"
+msgid "Extra Settings"
 msgstr ""
 
 msgctxt "#32009"
-msgid "Save JSON-RPC URL here?"
+msgid "Local IP address (optional):"
 msgstr ""
 
 msgctxt "#32010"
-msgid "Remote Kodi 1"
+msgid "Remote Kodi max wait time (seconds):"
 msgstr ""
 
 msgctxt "#32011"
-msgid "Remote IP address:"
+msgid "Save JSON-RPC URL here?"
 msgstr ""
 
 msgctxt "#32012"
+msgid "Logging level"
+msgstr ""
+
+msgctxt "#32100"
+msgid "Remote Kodi 1"
+msgstr ""
+
+msgctxt "#32101"
+msgid "Remote IP address:"
+msgstr ""
+
+msgctxt "#32102"
 msgid "Remote username:"
 msgstr ""
 
-msgctxt "#32013"
+msgctxt "#32103"
 msgid "Remote password:"
 msgstr ""
 
-msgctxt "#32014"
+msgctxt "#32104"
 msgid "Remote port:"
 msgstr ""
 
-msgctxt "#32020"
+msgctxt "#32200"
 msgid "Remote Kodi 2"
 msgstr ""
 
-msgctxt "#32030"
+msgctxt "#32300"
 msgid "Remote Kodi 3"
 msgstr ""
 
-msgctxt "#32040"
+msgctxt "#32400"
 msgid "Remote Kodi 4"
 msgstr ""
 
-msgctxt "#32050"
+msgctxt "#32500"
 msgid "Remote Kodi 5"
 msgstr ""

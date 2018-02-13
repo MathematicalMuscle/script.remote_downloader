@@ -120,12 +120,22 @@ def open(url, url_redirect=None, headers=None, cookie=None, size=0, r_ip=None, r
             headers = dict(req.header_items())
             cookie = resp.headers.get('Set-Cookie')
 
-            xbmc.log('{0}) '.format(i+1) + u, xbmc.LOGNOTICE)
-            xbmc.log('{0}) BEFORE headers:     '.format(i+1) + str(headers), xbmc.LOGNOTICE)
-            xbmc.log('{0}) `Request` headers:  '.format(i+1) + str(dict(req.header_items())), xbmc.LOGNOTICE)
-            xbmc.log('{0}) `urlopen` headers:  '.format(i+1) + str(dict(resp.headers)), xbmc.LOGNOTICE)
-            xbmc.log('{0}) RETURNED headers:   '.format(i+1) + str(headers), xbmc.LOGNOTICE)
-            xbmc.log('{0}) RETURNED cookie:    '.format(i+1) + str(cookie), xbmc.LOGNOTICE)
+            # log stuff on the requesting system
+            log_str = '\n\nRemote Downloader ({0})  [{1}]\n---------------------\n'.format(i+1, 'this system' if r_ip is None else 'remote system')
+            log_str += '* url:          {0}\n\n'.format(u)
+            log_str += '* headers (1):  {0}\n\n'.format(str(dict(req.header_items())))
+            log_str += '* headers (2):  {0}\n\n'.format(str(dict(resp.headers)))
+            log_str += '* headers (3):  {0}\n\n'.format(str(headers))
+            log_str += '* cookie:       {0}\n\n.'.format(str(cookie))
+            params = {'action': 'log', 'log_str': log_str}
+            result = jsonrpc_functions.jsonrpc('Addons.ExecuteAddon', params, 'script.remote_downloader', r_ip, r_port, r_user, r_pass)
+            
+            #xbmc.log('{0}) '.format(i+1) + u, xbmc.LOGNOTICE)
+            #xbmc.log('{0}) BEFORE headers:     '.format(i+1) + str(headers), xbmc.LOGNOTICE)
+            #xbmc.log('{0}) `Request` headers:  '.format(i+1) + str(dict(req.header_items())), xbmc.LOGNOTICE)
+            #xbmc.log('{0}) `urlopen` headers:  '.format(i+1) + str(dict(resp.headers)), xbmc.LOGNOTICE)
+            #xbmc.log('{0}) RETURNED headers:   '.format(i+1) + str(headers), xbmc.LOGNOTICE)
+            #xbmc.log('{0}) RETURNED cookie:    '.format(i+1) + str(cookie), xbmc.LOGNOTICE)
             break
         except:
             pass
