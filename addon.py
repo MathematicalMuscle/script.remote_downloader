@@ -245,6 +245,24 @@ if __name__ == "__main__":
         log_level = eval('xbmc.LOG{0}'.format(xbmcaddon.Addon('script.remote_downloader').getSetting('log_level')))
         xbmc.log(log_str, log_level)
         
+    if action == 'send_file':
+        # get the info about the downloading Kodi system, as well as this system
+        d_ip, d_port, d_user, d_pass, r_ip, r_port, r_user, r_pass = network_functions.get_system_addresses()
+        if d_ip is None:
+            sys.exit()
+            
+        file_to_send = xbmcgui.Dialog().browse(1, 'Remote Downloader', 'video')
+        if os.path.isfile(file_to_send):
+            url = 'http://{0}:{1}/vfs/{2}'.format(r_ip, r_port, urllib.quote(file_to_send))
+            title = os.path.splitext(os.path.basename(file_to_send))[0]
+            
+            params = {'action': 'prepare_download', 'title': title, 'url': url,
+                      'd_ip': d_ip, 'd_port': d_port, 'd_user': d_user, 'd_pass': d_pass,
+                      'r_ip': r_ip, 'r_port': r_port, 'r_user': r_user, 'r_pass': r_pass}
+            
+            method = 'Addons.ExecuteAddon'
+            result = jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader')
+            sys.exit()
 
     # ================================================== #
     #                                                    #

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.remote_downloader" name="Remote Downloader" version="0.1.46" provider-name="Mathematical Muscle">
+<addon id="script.remote_downloader" name="Remote Downloader" version="0.1.47" provider-name="Mathematical Muscle">
     <requires>
         <import addon="xbmc.python" version="2.14.0"/>
         <import addon="script.common.plugin.cache" version="0.9.1" />
@@ -86,5 +86,6 @@
         v0.1.44 (2018-02-09) - Fixed the path where links are saved
         v0.1.45 (2018-02-09) - Fixed the path where links are saved (again)
         v0.1.46 (2018-02-12) - Working on improved downloading on a remote Kodi
+        v0.1.47 (2018-02-17) - Added 'Send file to remote Kodi' option
     </news>
 </addon>

@@ -34,6 +34,7 @@ def menu():
              'Update remote addons',
              # 'Add a title regex substitution',
              autoexec_opt,
+             'Send file to remote Kodi',
              'Restart remote UPnP server']
 
     len_opts = len(opts)
@@ -71,6 +72,12 @@ def menu():
         
         elif selection == autoexec_opt:
             autoexec_functions.autoexec_add_remove(autoexec_opt)
+            sys.exit()
+            
+        elif selection == 'Send file to remote Kodi':
+            params = {'action': 'send_file'}
+            method = 'Addons.ExecuteAddon'
+            result = jsonrpc_functions.jsonrpc(method, params, 'script.remote_downloader')
             sys.exit()
             
         else:
