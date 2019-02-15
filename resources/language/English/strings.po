@@ -84,10 +84,6 @@ msgctxt "#32016"
 msgid "value3"
 msgstr ""
 
-msgctxt "#32017"
-msgid "Method"
-msgstr ""
-
 msgctxt "#32100"
 msgid "Remote Kodi 1"
 msgstr ""

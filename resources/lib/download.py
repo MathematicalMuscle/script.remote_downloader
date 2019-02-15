@@ -7,6 +7,7 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
+import json
 import os
 import sys
 import time
@@ -249,9 +250,10 @@ class Download(object):
         if not success:
             self.dialog_ok('{0} : {1}'.format(self.basename, '[COLOR red]Download failed[/COLOR]'))
         
-        elif not playing:
-            xbmcgui.Dialog().ok(self.title, text)
-            xbmcgui.Window(10000).clearProperty('GEN-DOWNLOADED')
+        else:
+            if not playing:
+                xbmcgui.Dialog().ok(self.title, text)
+                xbmcgui.Window(10000).clearProperty('GEN-DOWNLOADED')
 
             # make a webhook request
             webhook_url = xbmcaddon.Addon('script.remote_downloader').getSetting('webhook_url')
@@ -259,33 +261,23 @@ class Download(object):
                 value1 = self.title
                 value2 = xbmcaddon.Addon('script.remote_downloader').getSetting('webhook_value2')
                 value3 = xbmcaddon.Addon('script.remote_downloader').getSetting('webhook_value3')
-                get_post = xbmcaddon.Addon('script.remote_downloader').getSetting('webhook_get_post')
 
-                # POST
-                if get_post == 'POST':
-                    webhook_data = {'value1': value1}
-                    if value2:
-                        webhook_data['value2'] = value2
-                    if value3:
-                        webhook_data['value3'] = value3
+                webhook_data = {'value1': value1}
+                if value2:
+                    webhook_data['value2'] = value2
+                if value3:
+                    webhook_data['value3'] = value3
 
-                    req = urllib2.Request(webhook_url, webhook_data)
-                    try:
-                        response = urllib2.urlopen(req, timeout=15)
-                        response = response.read()
-                        response = json.loads(response)
+                data = json.dumps(webhook_data)
 
-                    # This error handling is specifically to catch HTTP errors and connection errors
-                    except urllib2.URLError as e:
-                        # In the event of an error, I am making the output begin with "ERROR " first, to allow for easy scripting.
-                        # You will get a couple different kinds of error messages in here, so I needed a consistent error condition to check for.
-                        return 'ERROR ' + str(e.reason)
+                # make a POST request
+                req = urllib2.Request(webhook_url, data)
+                try:
+                    response = urllib2.urlopen(req, timeout=15)
 
-                # GET
-                else:
-                    # https://stackoverflow.com/a/45511570
-                    # webhook_url += '?value1='.format(value1)
-                    pass
+                # This error handling is specifically to catch HTTP errors and connection errors
+                except urllib2.URLError as e:
+                    return 'ERROR ' + str(e.reason)
             
     def delete_tracker(self):
         """Delete the tracker file
