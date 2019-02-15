@@ -68,6 +68,26 @@ msgctxt "#32012"
 msgid "Logging level"
 msgstr ""
 
+msgctxt "#32013"
+msgid "Webhook Settings"
+msgstr ""
+
+msgctxt "#32014"
+msgid "Webhook URL"
+msgstr ""
+
+msgctxt "#32015"
+msgid "value2"
+msgstr ""
+
+msgctxt "#32016"
+msgid "value3"
+msgstr ""
+
+msgctxt "#32017"
+msgid "Method"
+msgstr ""
+
 msgctxt "#32100"
 msgid "Remote Kodi 1"
 msgstr ""

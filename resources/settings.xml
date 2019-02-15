@@ -14,6 +14,11 @@
     <setting label="32010" id="max_wait_time" type="number" default="3"/>
     <setting label="32011" id="save_jsonrpc_url" type="bool" default="false"/>
     <setting label="32012" id="log_level" type="select" values="DEBUG|INFO|NOTICE" default="DEBUG"/>
+    <setting label="32013" type="lsep"/>
+    <setting label="32014" id="webhook_url" type="text" default=""/>
+    <setting label="32015" id="webhook_value2" type="text" default=""/>
+    <setting label="32016" id="webhook_value3" type="text" default=""/>
+    <setting label="32017" id="webhook_get_post" type="select" values="GET|POST" default="POST"/>
   </category>
   <!-- Remote Kodi #1 -->
   <category label="32100">
