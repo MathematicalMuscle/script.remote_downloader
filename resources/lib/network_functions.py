@@ -8,34 +8,59 @@ import xbmcgui
 import xbmcvfs
 
 import functools
-import httplib
+import http.client
 import socket
 import sys
-import urllib2
-import urlparse
+
+PY2 = sys.version_info[0] == 2
+
+if not PY2:
+    import http.client
+    import urllib.request, urllib.error, urllib.parse
+else:
+    import httplib
+    import urllib2
+    import urlparse
 
 from . import jsonrpc_functions
 
 
-class BoundHTTPHandler(urllib2.HTTPHandler):
+if not PY2:
+    HTTPHandlerClass = urllib.request.HTTPHandler
+    HTTPSHandlerClass = urllib.request.HTTPHandler
+else:
+    HTTPHandlerClass = urllib2.HTTPHandler
+    HTTPSHandlerClass = urllib2.HTTPSHandler
+
+
+
+class BoundHTTPHandler(HTTPHandlerClass):
     """https://stackoverflow.com/a/14669175
     
     """
     def __init__(self, source_address=None, debuglevel=0):
-        urllib2.HTTPHandler.__init__(self, debuglevel)
-        self.http_class = functools.partial(httplib.HTTPConnection, source_address=source_address)
+        if not PY2:
+            urllib.request.HTTPHandler.__init__(self, debuglevel)
+            self.http_class = functools.partial(http.client.HTTPConnection, source_address=source_address)
+        else:
+            urllib2.HTTPHandler.__init__(self, debuglevel)
+            self.http_class = functools.partial(httplib.HTTPConnection, source_address=source_address)
 
     def http_open(self, req):
         return self.do_open(self.http_class, req)
 
 
-class BoundHTTPSHandler(urllib2.HTTPSHandler):
+class BoundHTTPSHandler(HTTPSHandlerClass):
     """https://stackoverflow.com/a/14669175
     
     """
     def __init__(self, source_address=None, debuglevel=0):
-        urllib2.HTTPSHandler.__init__(self, debuglevel)
-        self.https_class = functools.partial(httplib.HTTPSConnection, source_address=source_address)
+        if not PY2:
+            urllib.request.HTTPSHandler.__init__(self, debuglevel)
+            self.https_class = functools.partial(http.client.HTTPSConnection, source_address=source_address)
+        else:
+            urllib2.HTTPSHandler.__init__(self, debuglevel)
+            self.https_class = functools.partial(httplib.HTTPSConnection, source_address=source_address)
 
     def https_open(self, req):
         return self.do_open(self.https_class, req)
@@ -49,8 +74,11 @@ def get_opener(url0, r_ip):
         handler = BoundHTTPSHandler(source_address=(r_ip, 0))
     else:
         handler = BoundHTTPSHandler(source_address=(r_ip, 0))
-    
-    return urllib2.build_opener(handler)
+
+    if not PY2:
+        return urllib.request.build_opener(handler)
+    else:
+        return urllib2.build_opener(handler)
 
 
 def get_url0(url):
@@ -65,7 +93,10 @@ def get_headers(url):
     
     """
     try:
-        headers = dict(urlparse.parse_qsl(url.rsplit('|', 1)[1]))
+        if not PY2:
+            headers = dict(urllib.parse.parse_qsl(url.rsplit('|', 1)[1]))
+        else:
+            headers = dict(urlparse.parse_qsl(url.rsplit('|', 1)[1]))
     except:
         headers = dict()
     return headers
@@ -111,9 +142,16 @@ def open(url, url_redirect=None, headers=None, cookie=None, size=0, r_ip=None, r
             headers['Range'] = 'bytes={0}-'.format(int(size))
             
         try:
-            req = urllib2.Request(url0, headers=headers)
+            if not PY2:
+                req = urllib.request.Request(url0, headers=headers)
+            else:
+                req = urllib2.Request(url0, headers=headers)
+
             if i % 5 < 3:
-                resp = urllib2.urlopen(req, timeout=30)
+                if not PY2:
+                    resp = urllib.request.urlopen(req, timeout=30)
+                else:
+                    resp = urllib2.urlopen(req, timeout=30)
             else:
                 resp = get_opener(url0, r_ip).open(req, timeout=30)
                 

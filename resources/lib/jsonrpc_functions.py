@@ -2,12 +2,20 @@
 
 """
 
+import sys
+
 import xbmc
 
 import base64
 import json
-import urllib
-import urllib2
+
+PY2 = sys.version_info[0] == 2
+
+if not PY2:
+    import urllib.request, urllib.parse, urllib.error
+else:
+    import urllib
+    import urllib2
 
 
 def jsonrpc(method, params=None, addonid=None, ip=None, port=None, username=None, password=None, timeout=15):
@@ -19,7 +27,10 @@ def jsonrpc(method, params=None, addonid=None, ip=None, port=None, username=None
 
     if params is not None:
         if addonid is not None:
-            payload['params'] = {'addonid': addonid, 'params': urllib.quote_plus(str(params))}
+            if not PY2:
+                payload['params'] = {'addonid': addonid, 'params': urllib.parse.quote_plus(str(params))}
+            else:
+                payload['params'] = {'addonid': addonid, 'params': urllib.quote_plus(str(params))}
         else:
             payload['params'] = params
 
@@ -35,7 +46,11 @@ def jsonrpc(method, params=None, addonid=None, ip=None, port=None, username=None
         # prepare to initiate the connection
         url = 'http://{0}:{1}/jsonrpc'.format(ip, port)
         headers = {"Content-Type": "application/json"}
-        req = urllib2.Request(url, data, headers)
+        if not PY2:
+            req = urllib.request.Request(url, data, headers)
+        else:
+            req = urllib2.Request(url, data, headers)
+
         if username and password:
             # format the provided username & password and add them to the request header
             base64string = base64.encodestring('{0}:{1}'.format(username, password)).replace('\n', '')
@@ -43,12 +58,15 @@ def jsonrpc(method, params=None, addonid=None, ip=None, port=None, username=None
 
         # send the command
         try:
-            response = urllib2.urlopen(req, timeout=timeout)
+            if not PY2:
+                response = urllib.request.urlopen(req, timeout=timeout)
+            else:
+                response = urllib2.urlopen(req, timeout=timeout)
             response = response.read()
             response = json.loads(response)
 
         # This error handling is specifically to catch HTTP errors and connection errors
-        except urllib2.URLError as e:
+        except urllib.error.URLError as e:
             # In the event of an error, I am making the output begin with "ERROR " first, to allow for easy scripting.
             # You will get a couple different kinds of error messages in here, so I needed a consistent error condition to check for.
             return 'ERROR ' + str(e.reason)
@@ -67,7 +85,11 @@ def from_jsonrpc(parameters):
     """Extract a dictionary of the parameters sent via a JSON-RPC command
 
     """
-    params = eval(urllib.unquote_plus(parameters))
+    if not PY2:
+        params = eval(urllib.parse.unquote_plus(parameters))
+    else:
+        params = eval(urllib.unquote_plus(parameters))
+
     if 'url' in params:
         if isinstance(params['url'], str):
             params['url'] = params['url'].replace(' ', '')

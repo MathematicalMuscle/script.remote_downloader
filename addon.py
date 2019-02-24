@@ -33,7 +33,13 @@ import xbmcvfs
 
 import os
 import sys
-import urllib
+
+PY2 = sys.version_info[0] == 2
+
+if not PY2:
+    import urllib.request, urllib.parse, urllib.error
+else:
+    import urllib
 
 from resources.lib import autoexec_functions
 from resources.lib import download
@@ -236,7 +242,10 @@ if __name__ == "__main__":
         
         port = eval(xbmc.executeJSONRPC('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue","params":{"setting":"services.webserverport"}}'))['result']['value']
         with open(outfile, 'w') as f:
-            f.write('http://localhost:' + str(port) + '/jsonrpc?request={"jsonrpc":"2.0","id":1,"method":"Addons.ExecuteAddon","params":{"addonid":"script.remote_downloader","params":"' + urllib.quote_plus(str(_params)) + '"}}')
+            if not PY2:
+                f.write('http://localhost:' + str(port) + '/jsonrpc?request={"jsonrpc":"2.0","id":1,"method":"Addons.ExecuteAddon","params":{"addonid":"script.remote_downloader","params":"' + urllib.parse.quote_plus(str(_params)) + '"}}')
+            else:
+                f.write('http://localhost:' + str(port) + '/jsonrpc?request={"jsonrpc":"2.0","id":1,"method":"Addons.ExecuteAddon","params":{"addonid":"script.remote_downloader","params":"' + urllib.quote_plus(str(_params)) + '"}}')
 
         sys.exit()
     
@@ -253,7 +262,10 @@ if __name__ == "__main__":
             
         file_to_send = xbmcgui.Dialog().browse(1, 'Remote Downloader', 'video')
         if os.path.isfile(file_to_send):
-            url = 'http://{0}:{1}/vfs/{2}'.format(r_ip, r_port, urllib.quote(file_to_send))
+            if not PY2:
+                url = 'http://{0}:{1}/vfs/{2}'.format(r_ip, r_port, urllib.parse.quote(file_to_send))
+            else:
+                url = 'http://{0}:{1}/vfs/{2}'.format(r_ip, r_port, urllib.quote(file_to_send))
             title = os.path.splitext(os.path.basename(file_to_send))[0]
             
             params = {'action': 'prepare_download', 'title': title, 'url': url,
@@ -516,7 +528,7 @@ if __name__ == "__main__":
 
         # get the name of the file to be created
         dest, _ = name_functions.get_dest(title, url)
-        if isinstance(dest, (str, unicode)):
+        if (not PY2 and isinstance(dest, str)) or (PY2 and isinstance(dest, (str, unicode))):
             # `dest` is a string --> get the basename
             basename = os.path.basename(dest)
         else:

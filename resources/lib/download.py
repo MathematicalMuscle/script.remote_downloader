@@ -11,7 +11,13 @@ import json
 import os
 import sys
 import time
-import urllib2
+
+PY2 = sys.version_info[0] == 2
+
+if not PY2:
+    import urllib.request, urllib.error, urllib.parse
+else:
+    import urllib2
 
 from . import jsonrpc_functions
 from . import name_functions
@@ -133,7 +139,7 @@ class Download(object):
                         self.done(True)
                         sys.exit()
 
-            except Exception, e:
+            except Exception as e:
                 xbmc.log('script.remote_downloader: ' + str(e))
                 error = True
                 sleep = 10
@@ -271,12 +277,19 @@ class Download(object):
                 data = json.dumps(webhook_data)
 
                 # make a POST request
-                req = urllib2.Request(webhook_url, data)
+                if not PY2:
+                    req = urllib.request.Request(webhook_url, data)
+                else:
+                    req = urllib2.Request(webhook_url, data)
+
                 try:
-                    response = urllib2.urlopen(req, timeout=15)
+                    if not PY2:
+                        response = urllib.request.urlopen(req, timeout=15)
+                    else:
+                        response = urllib2.urlopen(req, timeout=15)
 
                 # This error handling is specifically to catch HTTP errors and connection errors
-                except urllib2.URLError as e:
+                except urllib.error.URLError as e:
                     return 'ERROR ' + str(e.reason)
             
     def delete_tracker(self):

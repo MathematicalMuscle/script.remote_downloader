@@ -9,7 +9,14 @@ import xbmcvfs
 
 import os
 import re
-import urlparse
+import sys
+
+PY2 = sys.version_info[0] == 2
+
+if not PY2:
+    import urllib.parse
+else:
+    import urlparse
 
 from . import network_functions
 
@@ -108,7 +115,10 @@ def get_dest(title, url, look_for_duplicates=True):
 
     # add the extension
     url0 = network_functions.get_url0(url)
-    ext = os.path.splitext(urlparse.urlparse(url0).path)[1][1:]
+    if not PY2:
+        ext = os.path.splitext(urllib.parse.urlparse(url0).path)[1][1:]
+    else:
+        ext = os.path.splitext(urlparse.urlparse(url0).path)[1][1:]
     if ext not in ['mp4', 'mkv', 'flv', 'avi', 'mpg']:
         ext = 'mp4'
 
