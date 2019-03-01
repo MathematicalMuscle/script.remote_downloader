@@ -8,7 +8,6 @@ import xbmcgui
 import xbmcvfs
 
 import functools
-import http.client
 import socket
 import sys
 
